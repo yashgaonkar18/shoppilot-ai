@@ -19,19 +19,26 @@ import startReorderJob from "./jobs/reorder.job.js";
 import startInventoryJob from "./jobs/inventory.job.js";
 import billingRoutes from "./routes/billing.js";
 import whatsappRoutes from "./routes/whatsapp.routes.js";
+
 const app = express();
 
 // Connect MongoDB
 await connectDB();
 startReorderJob();
 startInventoryJob();
+
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    process.env.FRONTEND_URL, // set this in .env after Vercel deploy
+  ].filter(Boolean),
+  credentials: true,
+}));
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
-
 app.use(cookieParser());
 
 // Home Route
@@ -44,25 +51,15 @@ app.get("/", (req, res) => {
 
 // API Routes
 app.use("/api/auth", authRoutes);
-
 app.use("/api/products", productRoutes);
-
 app.use("/api/sales", saleRoutes);
-
 app.use("/api/invoices", invoiceRoutes);
-
 app.use("/api/dashboard", dashboardRoutes);
-
 app.use("/api/customers", customerRoutes);
-
 app.use("/api/profile", profileRoutes);
-
 app.use("/api/ai", aiRoutes);
-
 app.use("/api/notifications", notificationRoutes);
-
 app.use("/api/billing", billingRoutes);
-
 app.use("/api/whatsapp", whatsappRoutes);
 
 // 404 Handler
