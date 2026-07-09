@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Store, Sparkles, Eye, EyeOff } from "lucide-react";
 import { store } from "@/lib/mock-store";
 import { toast } from "sonner";
-import { registerUser, loginUser } from "@/api/auth.js";
+import { registerUser, loginUser } from "@/api/auth.ts";
 
 export default function AuthPage() {
   const navigate = useNavigate();
