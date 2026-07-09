@@ -22,7 +22,7 @@ import whatsappRoutes from "./routes/whatsapp.routes.js";
 
 const app = express();
 
-// Connect MongoDB
+// Connect MongoDB Atlas
 await connectDB();
 startReorderJob();
 startInventoryJob();
