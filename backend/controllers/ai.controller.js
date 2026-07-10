@@ -9,11 +9,11 @@ export const chat = async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    const products = await Product.find();
+    const products = await Product.find({ userId: req.user._id });
 
-    const sales = await Sale.find();
+    const sales = await Sale.find({ userId: req.user._id });
 
-    const invoices = await Invoice.find();
+    const invoices = await Invoice.find({ userId: req.user._id });
 
     const user = await User.findById(req.user.id);
 

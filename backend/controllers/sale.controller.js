@@ -18,7 +18,7 @@ export const createSale = async (req, res) => {
     const saleItems = [];
 
     for (const item of items) {
-      const product = await Product.findById(item.product_id);
+      const product = await Product.findOne({ _id: item.product_id, userId: req.user._id });
 
       if (!product) {
         return res.status(404).json({
@@ -55,12 +55,14 @@ export const createSale = async (req, res) => {
       customer_phone,
       total,
       sale_items: saleItems,
+      userId: req.user._id,
     });
 
     const invoice = await Invoice.create({
       invoice_number: `INV-${Date.now()}`,
       total,
       sale: sale._id,
+      userId: req.user._id,
     });
 
     res.status(201).json({
@@ -80,7 +82,7 @@ export const createSale = async (req, res) => {
 // Get All Sales
 export const getSales = async (req, res) => {
   try {
-    const sales = await Sale.find().sort({ createdAt: -1 });
+    const sales = await Sale.find({ userId: req.user._id }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -98,7 +100,7 @@ export const getSales = async (req, res) => {
 // Get Sale By ID
 export const getSaleById = async (req, res) => {
   try {
-    const sale = await Sale.findById(req.params.id);
+    const sale = await Sale.findOne({ _id: req.params.id, userId: req.user._id });
 
     if (!sale) {
       return res.status(404).json({
@@ -122,7 +124,7 @@ export const getSaleById = async (req, res) => {
 // Delete Sale
 export const deleteSale = async (req, res) => {
   try {
-    const sale = await Sale.findByIdAndDelete(req.params.id);
+    const sale = await Sale.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
 
     if (!sale) {
       return res.status(404).json({

@@ -3,7 +3,7 @@ import Invoice from "../models/Invoice.js";
 // Get All Invoices
 export const getInvoices = async (req, res) => {
   try {
-    const invoices = await Invoice.find()
+    const invoices = await Invoice.find({ userId: req.user._id })
       .populate("sale")
       .sort({ createdAt: -1 });
 
@@ -23,7 +23,7 @@ export const getInvoices = async (req, res) => {
 // Get Invoice By ID
 export const getInvoiceById = async (req, res) => {
   try {
-    const invoice = await Invoice.findById(req.params.id)
+    const invoice = await Invoice.findOne({ _id: req.params.id, userId: req.user._id })
       .populate("sale");
 
     if (!invoice) {
@@ -48,7 +48,7 @@ export const getInvoiceById = async (req, res) => {
 // Delete Invoice
 export const deleteInvoice = async (req, res) => {
   try {
-    const invoice = await Invoice.findByIdAndDelete(req.params.id);
+    const invoice = await Invoice.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
 
     if (!invoice) {
       return res.status(404).json({

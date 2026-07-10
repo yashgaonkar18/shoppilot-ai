@@ -178,7 +178,7 @@ export default function AuthPage() {
             </button>
 
             <p className="text-[11px] text-muted-foreground text-center">
-              UI demo — no real authentication.
+              Your connection is secure.
             </p>
           </form>
         </div>

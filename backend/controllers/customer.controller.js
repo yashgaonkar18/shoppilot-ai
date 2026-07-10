@@ -3,7 +3,7 @@ import Customer from "../models/Customer.js";
 export const getCustomers = async (req, res) => {
   try {
 
-    const customers = await Customer.find().sort({
+    const customers = await Customer.find({ userId: req.user._id }).sort({
       createdAt: -1
     });
 
@@ -26,7 +26,7 @@ export const createCustomer = async (req, res) => {
 
   try {
 
-    const customer = await Customer.create(req.body);
+    const customer = await Customer.create({ ...req.body, userId: req.user._id });
 
     res.status(201).json({
       success: true,
@@ -48,8 +48,8 @@ export const updateCustomer = async (req, res) => {
 
   try {
 
-    const customer = await Customer.findByIdAndUpdate(
-      req.params.id,
+    const customer = await Customer.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
       req.body,
       {
         new: true,
@@ -86,7 +86,7 @@ export const deleteCustomer = async (req, res) => {
 
   try {
 
-    const customer = await Customer.findByIdAndDelete(req.params.id);
+    const customer = await Customer.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
 
     if (!customer) {
 

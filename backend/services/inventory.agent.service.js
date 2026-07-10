@@ -1,46 +1,56 @@
 import Product from "../models/Product.js";
 import Notification from "../models/Notification.js";
 import AgentLog from "../models/AgentLog.js";
+import User from "../models/User.js";
 import ai from "../config/gemini.js";
 
 export const monitorInventory = async () => {
   console.log("🤖 AI Inventory Agent Running...");
 
-  const products = await Product.find({
-    $expr: {
-      $lte: ["$qty", "$low_stock_threshold"],
-    },
-  });
+  try {
+    const users = await User.find();
 
-  if (products.length === 0) {
-    console.log("✅ No low stock products.");
+    for (const user of users) {
+      console.log(`Scanning inventory for user: ${user.email} (${user.shop_name})`);
 
-    await AgentLog.create({
-      timestamp: new Date(),
-      action: "Inventory Scan",
-      productName: "-",
-      decision: "No low stock products found",
-      status: "skipped",
-    });
-
-    return;
-  }
-
-  for (const product of products) {
-    try {
-      // Prevent duplicate notifications
-      const exists = await Notification.findOne({
-        title: "Low Stock Alert",
-        message: { $regex: product.name, $options: "i" },
-        status: "unread",
+      const products = await Product.find({
+        userId: user._id,
+        $expr: {
+          $lte: ["$qty", "$low_stock_threshold"],
+        },
       });
 
-      if (exists) {
-        console.log(`${product.name} already has an unread notification.`);
+      if (products.length === 0) {
+        console.log(`✅ No low stock products for user: ${user.email}`);
+
+        await AgentLog.create({
+          userId: user._id,
+          timestamp: new Date(),
+          action: "Inventory Scan",
+          productName: "-",
+          decision: "No low stock products found",
+          status: "skipped",
+        });
+
         continue;
       }
 
-      const prompt = `
+      for (const product of products) {
+        try {
+          // Prevent duplicate notifications
+          const exists = await Notification.findOne({
+            userId: user._id,
+            title: "Low Stock Alert",
+            message: { $regex: product.name, $options: "i" },
+            status: "unread",
+          });
+
+          if (exists) {
+            console.log(`${product.name} already has an unread notification for user ${user.email}.`);
+            continue;
+          }
+
+          const prompt = `
 You are an AI inventory assistant.
 
 Generate a short professional notification.
@@ -57,38 +67,45 @@ ${product.low_stock_threshold}
 Return only the notification message.
 `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-      });
+          const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+          });
 
-      const message = response.text;
+          const message = response.text;
 
-      await Notification.create({
-        title: "Low Stock Alert",
-        message,
-        status: "unread",
-      });
+          await Notification.create({
+            userId: user._id,
+            title: "Low Stock Alert",
+            message,
+            status: "unread",
+          });
 
-      await AgentLog.create({
-        timestamp: new Date(),
-        action: "Low Stock Detection",
-        productName: product.name,
-        decision: "Notification Generated",
-        status: "success",
-      });
+          await AgentLog.create({
+            userId: user._id,
+            timestamp: new Date(),
+            action: "Low Stock Detection",
+            productName: product.name,
+            decision: "Notification Generated",
+            status: "success",
+          });
 
-      console.log(`✅ Notification created for ${product.name}`);
-    } catch (err) {
-      console.error(err.message);
+          console.log(`✅ Notification created for ${product.name} (user: ${user.email})`);
+        } catch (err) {
+          console.error(`Error processing product ${product.name} for user ${user.email}:`, err.message);
 
-      await AgentLog.create({
-        timestamp: new Date(),
-        action: "Low Stock Detection",
-        productName: product.name,
-        decision: err.message,
-        status: "failed",
-      });
+          await AgentLog.create({
+            userId: user._id,
+            timestamp: new Date(),
+            action: "Low Stock Detection",
+            productName: product.name,
+            decision: err.message,
+            status: "failed",
+          });
+        }
+      }
     }
+  } catch (globalErr) {
+    console.error("Global Inventory Agent Error:", globalErr.message);
   }
 };

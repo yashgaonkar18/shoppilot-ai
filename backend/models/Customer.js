@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const customerSchema = new mongoose.Schema(
 {
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
     name: {
         type: String,
         required: true
@@ -9,8 +15,7 @@ const customerSchema = new mongoose.Schema(
 
     phone: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
 
     email: {
@@ -27,6 +32,8 @@ const customerSchema = new mongoose.Schema(
 {
     timestamps: true
 });
+
+customerSchema.index({ phone: 1, userId: 1 }, { unique: true });
 
 const Customer = mongoose.model("Customer", customerSchema);
 

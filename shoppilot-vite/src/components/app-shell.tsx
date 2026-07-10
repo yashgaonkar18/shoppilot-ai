@@ -44,6 +44,8 @@ export function AppShell({ children, title, subtitle, action }: {
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const handleSignOut = () => {
+    localStorage.removeItem("token");
+    store.reset();
     store.setUser(null);
     navigate("/");
   };

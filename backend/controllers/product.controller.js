@@ -3,7 +3,7 @@ import Product from "../models/Product.js";
 // Get all products
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const products = await Product.find({ userId: req.user._id }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -21,7 +21,7 @@ export const getProducts = async (req, res) => {
 // Get single product
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findOne({ _id: req.params.id, userId: req.user._id });
 
     if (!product) {
       return res.status(404).json({
@@ -45,7 +45,7 @@ export const getProductById = async (req, res) => {
 // Create product
 export const createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const product = await Product.create({ ...req.body, userId: req.user._id });
 
     res.status(201).json({
       success: true,
@@ -63,8 +63,8 @@ export const createProduct = async (req, res) => {
 // Update product
 export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
+    const product = await Product.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
       req.body,
       {
         new: true,
@@ -95,7 +95,7 @@ export const updateProduct = async (req, res) => {
 // Delete product
 export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
 
     if (!product) {
       return res.status(404).json({

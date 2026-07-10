@@ -5,7 +5,7 @@ const startReorderJob = () => {
   console.log("✅ Reorder Agent Cron Started");
 
   // Every hour
-  cron.schedule("0 * * * *", async () => {
+  cron.schedule("0 0 * * *", async () => {
     console.log("\nRunning scheduled AI Reorder Agent...\n");
 
     try {

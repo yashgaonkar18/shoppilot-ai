@@ -4,13 +4,16 @@ import Invoice from "../models/Invoice.js";
 
 export const getDashboard = async (req, res) => {
   try {
-    const totalProducts = await Product.countDocuments();
+    const totalProducts = await Product.countDocuments({ userId: req.user._id });
 
-    const totalSales = await Sale.countDocuments();
+    const totalSales = await Sale.countDocuments({ userId: req.user._id });
 
-    const totalInvoices = await Invoice.countDocuments();
+    const totalInvoices = await Invoice.countDocuments({ userId: req.user._id });
 
     const revenue = await Sale.aggregate([
+      {
+        $match: { userId: req.user._id }
+      },
       {
         $group: {
           _id: null,
@@ -20,12 +23,13 @@ export const getDashboard = async (req, res) => {
     ]);
 
     const lowStockProducts = await Product.find({
+      userId: req.user._id,
       $expr: {
         $lte: ["$qty", "$low_stock_threshold"]
       }
     });
 
-    const recentSales = await Sale.find()
+    const recentSales = await Sale.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
       .limit(5);
 

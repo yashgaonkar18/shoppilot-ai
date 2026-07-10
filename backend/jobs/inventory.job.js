@@ -5,7 +5,7 @@ const startInventoryJob = () => {
   console.log("🤖 Inventory AI Job Started");
 
   // Every hour
-  cron.schedule("* * * * *", async () => {
+  cron.schedule("0 0 * * *", async () => {
     console.log("\nRunning Inventory AI Agent...\n");
 
     try {
