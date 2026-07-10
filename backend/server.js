@@ -5,17 +5,6 @@ import cookieParser from "cookie-parser";
 
 import connectDB from "./config/db.js";
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  console.log(`➡️  ${req.method} ${req.originalUrl}`);
-  
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    console.log(`⬅️  ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
-  });
-  
-  next();
-});
 
 // Routes
 import authRoutes from "./routes/auth.routes.js";
@@ -39,6 +28,17 @@ await connectDB();
 startReorderJob();
 startInventoryJob();
 
+app.use((req, res, next) => {
+  const start = Date.now();
+  console.log(`➡️  ${req.method} ${req.originalUrl}`);
+  
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(`⬅️  ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+  });
+  
+  next();
+});
 // Middlewares
 app.use(cors({
   origin: [
