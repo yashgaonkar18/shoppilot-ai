@@ -4,10 +4,7 @@ import Notification from "../models/Notification.js";
 export const getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({
-      $or: [
-        { userId: req.user._id },
-        { userId: null }, // include global notifications (from agents before userId was added)
-      ],
+      userId: req.user._id,
     }).sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -26,8 +23,8 @@ export const getNotifications = async (req, res) => {
 // Mark notification as read
 export const markAsRead = async (req, res) => {
   try {
-    const notification = await Notification.findByIdAndUpdate(
-      req.params.id,
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
       { status: "read" },
       { new: true }
     );
@@ -54,7 +51,10 @@ export const markAsRead = async (req, res) => {
 // Delete notification
 export const deleteNotification = async (req, res) => {
   try {
-    const notification = await Notification.findByIdAndDelete(req.params.id);
+    const notification = await Notification.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
 
     if (!notification) {
       return res.status(404).json({
