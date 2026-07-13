@@ -3,19 +3,25 @@ import { useState } from "react";
 import { Store, Sparkles, Eye, EyeOff } from "lucide-react";
 import { store } from "@/lib/mock-store";
 import { toast } from "sonner";
-import { registerUser, loginUser } from "@/api/auth.ts";
+import { registerUser, loginUser, forgotPasswordUser, resetPasswordUser } from "@/api/auth.ts";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot_email" | "forgot_otp">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [shopName, setShopName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       if (mode === "signup") {
@@ -31,7 +37,7 @@ export default function AuthPage() {
         store.setUser(res.data.user);
         toast.success("Account created successfully");
         navigate("/dashboard");
-      } else {
+      } else if (mode === "signin") {
         const res = await loginUser({
           email,
           password,
@@ -41,9 +47,33 @@ export default function AuthPage() {
         store.setUser(res.data.user);
         toast.success("Login Successful");
         navigate("/dashboard");
+      } else if (mode === "forgot_email") {
+        const res = await forgotPasswordUser({ email });
+        toast.success(res.data?.message || "OTP sent to your email");
+        setMode("forgot_otp");
+      } else if (mode === "forgot_otp") {
+        if (newPassword !== confirmPassword) {
+          toast.error("Passwords do not match");
+          setIsLoading(false);
+          return;
+        }
+        if (newPassword.length < 6) {
+          toast.error("Password must be at least 6 characters");
+          setIsLoading(false);
+          return;
+        }
+        const res = await resetPasswordUser({ email, otp, newPassword });
+        toast.success(res.data?.message || "Password reset successfully. Please sign in with your new password.");
+        setPassword("");
+        setOtp("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setMode("signin");
       }
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,34 +117,40 @@ export default function AuthPage() {
 
         <div className="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto">
           <h1 className="text-2xl font-semibold tracking-tight">
-            {mode === "signin" ? "Welcome back" : "Create your shop"}
+            {mode === "signin" && "Welcome back"}
+            {mode === "signup" && "Create your shop"}
+            {mode === "forgot_email" && "Reset Password"}
+            {mode === "forgot_otp" && "Verify OTP"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {mode === "signin"
-              ? "Sign in to continue to your dashboard."
-              : "Get started — no credit card required."}
+            {mode === "signin" && "Sign in to continue to your dashboard."}
+            {mode === "signup" && "Get started — no credit card required."}
+            {mode === "forgot_email" && "Enter your email to receive a password reset OTP."}
+            {mode === "forgot_otp" && "Enter the OTP sent to your email to set a new password."}
           </p>
 
-          <div className="mt-6 flex p-1 rounded-lg bg-muted text-sm font-medium">
-            <button
-              type="button"
-              onClick={() => setMode("signin")}
-              className={`flex-1 h-9 rounded-md ${
-                mode === "signin" ? "bg-card shadow-soft" : "text-muted-foreground"
-              }`}
-            >
-              Sign in
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("signup")}
-              className={`flex-1 h-9 rounded-md ${
-                mode === "signup" ? "bg-card shadow-soft" : "text-muted-foreground"
-              }`}
-            >
-              Sign up
-            </button>
-          </div>
+          {(mode === "signin" || mode === "signup") && (
+            <div className="mt-6 flex p-1 rounded-lg bg-muted text-sm font-medium">
+              <button
+                type="button"
+                onClick={() => setMode("signin")}
+                className={`flex-1 h-9 rounded-md ${
+                  mode === "signin" ? "bg-card shadow-soft" : "text-muted-foreground"
+                }`}
+              >
+                Sign in
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("signup")}
+                className={`flex-1 h-9 rounded-md ${
+                  mode === "signup" ? "bg-card shadow-soft" : "text-muted-foreground"
+                }`}
+              >
+                Sign up
+              </button>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-3">
             {mode === "signup" && (
@@ -135,49 +171,134 @@ export default function AuthPage() {
               </>
             )}
 
-            <Input
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              placeholder="you@shop.com"
-              required
-            />
+            {mode !== "forgot_otp" ? (
+              <Input
+                label="Email"
+                type="email"
+                value={email}
+                onChange={setEmail}
+                placeholder="you@shop.com"
+                required
+              />
+            ) : (
+              <div className="p-3 bg-muted/50 border border-border rounded-lg text-xs space-y-1">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Sending OTP to</span>
+                <div className="font-semibold text-foreground">{email}</div>
+              </div>
+            )}
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-medium">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+            {(mode === "signin" || mode === "signup") && (
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="w-full h-10 rounded-lg border border-input bg-background px-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {mode === "forgot_otp" && (
+              <>
+                <Input
+                  label="6-Digit OTP"
+                  value={otp}
+                  onChange={setOtp}
+                  placeholder="123456"
+                  required
+                />
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium">New Password</label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      className="w-full h-10 rounded-lg border border-input bg-background px-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword((prev) => !prev)}
+                      className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                      aria-label={showNewPassword ? "Hide password" : "Show password"}
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <Input
+                  label="Confirm New Password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
                   placeholder="••••••••"
                   required
-                  className="w-full h-10 rounded-lg border border-input bg-background px-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
                 />
+              </>
+            )}
+
+            {mode === "signin" && (
+              <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  onClick={() => setMode("forgot_email")}
+                  className="text-xs text-brand hover:underline font-medium"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  Forgot password?
                 </button>
               </div>
-            </div>
+            )}
 
             <button
               type="submit"
-              className="w-full h-11 rounded-lg bg-gradient-brand text-brand-foreground text-sm font-semibold shadow-glow hover:opacity-95"
+              disabled={isLoading}
+              className="w-full h-11 rounded-lg bg-gradient-brand text-brand-foreground text-sm font-semibold shadow-glow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {mode === "signin" ? "Sign in" : "Create account"}
+              {isLoading ? (
+                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+              ) : null}
+              {mode === "signin" && "Sign in"}
+              {mode === "signup" && "Create account"}
+              {mode === "forgot_email" && "Send OTP"}
+              {mode === "forgot_otp" && "Reset Password"}
             </button>
 
-            <p className="text-[11px] text-muted-foreground text-center">
+            {(mode === "forgot_email" || mode === "forgot_otp") && (
+              <button
+                type="button"
+                onClick={() => setMode("signin")}
+                className="w-full text-xs text-muted-foreground hover:text-foreground font-medium text-center mt-2 bg-transparent border-0 outline-none"
+              >
+                Back to Sign in
+              </button>
+            )}
+
+            <p className="text-[11px] text-muted-foreground text-center pt-2">
               Your connection is secure.
             </p>
           </form>

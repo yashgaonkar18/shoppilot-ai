@@ -1,6 +1,6 @@
 import * as authService from "../services/auth.service.js";
 import User from "../models/User.js";
-// Register
+
 export const register = async (req, res) => {
   try {
     const result = await authService.register(req.body);
@@ -18,7 +18,7 @@ export const register = async (req, res) => {
   }
 };
 
-// Login
+
 export const login = async (req, res) => {
   try {
     const result = await authService.login(req.body);
@@ -76,6 +76,57 @@ export const updateProfile = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Forgot Password
+export const forgotPassword = async (req, res) => {
+  try {
+    const result = await authService.forgotPassword(req.body);
+    res.status(200).json({
+      success: true,
+      message: "OTP sent to your email",
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Verify OTP
+export const verifyOTP = async (req, res) => {
+  try {
+    const result = await authService.verifyOTP(req.body);
+    res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Reset Password
+export const resetPassword = async (req, res) => {
+  try {
+    const result = await authService.resetPassword(req.body);
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
       success: false,
       message: error.message,
     });

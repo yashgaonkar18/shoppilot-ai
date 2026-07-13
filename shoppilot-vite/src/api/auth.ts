@@ -42,3 +42,20 @@ export const updateProfile = (data: {
   owner_name: string;
   phone: string;
 }) => api.put("/auth/profile", data, authHeader());
+
+// Forgot Password API helper calls
+export const forgotPasswordUser = (data: { email: string }) => {
+  return api.post("/auth/forgot-password", data);
+};
+
+export const verifyOTPUser = (data: { email: string; otp: string }) => {
+  return api.post("/auth/verify-otp", data);
+};
+
+export const resetPasswordUser = (data: {
+  email: string;
+  otp: string;
+  newPassword: string;
+}) => {
+  return api.post("/auth/reset-password", data);
+};
