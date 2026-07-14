@@ -23,7 +23,7 @@ const HEADER_OFFSET = 72; // sticky header height + a little breathing room
 export default function Landing() {
   const { user } = useAuth();
 
-  const scrollToSection = (id) => (e) => {
+  const scrollToSection = (id:any) => (e:any) => {
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
