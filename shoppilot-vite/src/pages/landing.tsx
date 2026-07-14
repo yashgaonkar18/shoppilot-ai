@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Store, Sparkles, Package, Receipt, MessageCircle, BarChart3, ArrowRight, Check, Bell } from "lucide-react";
+import { Store, Sparkles, Package, Receipt, MessageCircle, BarChart3, ArrowRight, Check, Bell, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function Landing() {
@@ -20,9 +20,15 @@ export default function Landing() {
           </Link>
           <div className="flex items-center gap-2">
             {user ? (
-              <Link to="/dashboard" className="inline-flex h-9 items-center gap-1.5 px-3.5 rounded-lg bg-gradient-brand text-brand-foreground text-sm font-medium shadow-glow hover:opacity-95">
-                Go to Dashboard <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                  <UserIcon className="h-4 w-4 text-brand" />
+                  {user.owner_name || user.shop_name}
+                </span>
+                <Link to="/dashboard" className="inline-flex h-9 items-center gap-1.5 px-3.5 rounded-lg bg-gradient-brand text-brand-foreground text-sm font-medium shadow-glow hover:opacity-95">
+                  Go to Dashboard <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
             ) : (
               <>
                 <Link to="/auth" className="hidden sm:inline-flex h-9 items-center px-3 rounded-lg text-sm font-medium hover:bg-accent">Sign in</Link>
@@ -49,9 +55,15 @@ export default function Landing() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-2.5">
             {user ? (
-              <Link to="/dashboard" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
-                Go to Dashboard <ArrowRight className="h-4 w-4" />
-              </Link>
+              <div className="flex flex-col items-center gap-3">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground bg-accent/40 px-3 py-1.5 rounded-full border border-border">
+                  <UserIcon className="h-4 w-4 text-brand animate-pulse" />
+                  Welcome back, <span className="font-semibold text-foreground">{user.owner_name || user.shop_name}</span>
+                </span>
+                <Link to="/dashboard" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
+                  Go to Dashboard <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             ) : (
               <>
                 <Link to="/auth" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
@@ -135,9 +147,15 @@ export default function Landing() {
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">Start in 2 minutes. Free during beta.</h2>
           <p className="mt-3 text-muted-foreground">Join the shops already moving their inventory and sales onto ShopPilot.</p>
           {user ? (
-            <Link to="/dashboard" className="mt-6 inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
-              Go to Dashboard <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-col items-center gap-3 mt-6">
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                <UserIcon className="h-4 w-4 text-brand animate-pulse" />
+                Logged in as <span className="font-semibold text-foreground">{user.owner_name || user.shop_name}</span>
+              </span>
+              <Link to="/dashboard" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
+                Go to Dashboard <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           ) : (
             <Link to="/auth" className="mt-6 inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
               Create your shop <ArrowRight className="h-4 w-4" />
