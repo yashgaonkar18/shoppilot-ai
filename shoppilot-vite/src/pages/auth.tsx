@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Store, Sparkles, Eye, EyeOff } from "lucide-react";
 import { store } from "@/lib/mock-store";
 import { toast } from "sonner";
 import { registerUser, loginUser, forgotPasswordUser, resetPasswordUser } from "@/api/auth.ts";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup" | "forgot_email" | "forgot_otp">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +20,12 @@ export default function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

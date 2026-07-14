@@ -101,7 +101,7 @@ function SidebarInner({ shopName, initials, onSignOut }: { shopName: string; ini
           <Store className="h-4 w-4" />
         </div>
         <div className="leading-tight">
-          <div className="text-sm font-semibold tracking-tight">ShopPilot</div>
+          <Link to="/" className="text-sm font-semibold tracking-tight">ShopPilot</Link>
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">AI Business Manager</div>
         </div>
       </div>
