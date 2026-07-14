@@ -18,8 +18,18 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
+const HEADER_OFFSET = 72; // sticky header height + a little breathing room
+
 export default function Landing() {
   const { user } = useAuth();
+
+  const scrollToSection = (id) => (e) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+    window.scrollTo({ top, behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -37,10 +47,10 @@ export default function Landing() {
 
           {/* Desktop nav links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a>
-            <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
-            <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+            <a href="#features" onClick={scrollToSection("features")} className="hover:text-foreground transition-colors">Features</a>
+            <a href="#how-it-works" onClick={scrollToSection("how-it-works")} className="hover:text-foreground transition-colors">How it works</a>
+            <a href="#pricing" onClick={scrollToSection("pricing")} className="hover:text-foreground transition-colors">Pricing</a>
+            <a href="#faq" onClick={scrollToSection("faq")} className="hover:text-foreground transition-colors">FAQ</a>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -126,7 +136,7 @@ export default function Landing() {
       </section>
 
       {/* Feature grid */}
-      <section id="features" className="py-20">
+      <section id="features" className="py-20 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Everything you need</div>
@@ -157,7 +167,7 @@ export default function Landing() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="py-20 bg-secondary/40">
+      <section id="how-it-works" className="py-20 bg-secondary/40 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Getting started</div>
@@ -234,7 +244,7 @@ export default function Landing() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20">
+      <section id="pricing" className="py-20 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Simple pricing</div>
@@ -302,7 +312,7 @@ export default function Landing() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-20 bg-secondary/40">
+      <section id="faq" className="py-20 bg-secondary/40 scroll-mt-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Questions</div>
@@ -359,9 +369,9 @@ export default function Landing() {
             <span className="text-sm font-medium">ShopPilot AI</span>
           </div>
           <div className="flex gap-6 text-xs text-muted-foreground">
-            <a href="#features" className="hover:text-foreground">Features</a>
-            <a href="#pricing" className="hover:text-foreground">Pricing</a>
-            <a href="#faq" className="hover:text-foreground">FAQ</a>
+            <a href="#features" onClick={scrollToSection("features")} className="hover:text-foreground">Features</a>
+            <a href="#pricing" onClick={scrollToSection("pricing")} className="hover:text-foreground">Pricing</a>
+            <a href="#faq" onClick={scrollToSection("faq")} className="hover:text-foreground">FAQ</a>
           </div>
           <div className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} ShopPilot AI · Made in India 🇮🇳
