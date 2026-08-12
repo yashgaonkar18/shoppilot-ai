@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import { Store, Sparkles, Eye, EyeOff } from "lucide-react";
 import { store } from "@/lib/mock-store";
 import { toast } from "sonner";
-import { registerUser, loginUser, forgotPasswordUser, resetPasswordUser } from "@/api/auth.ts";
+import { registerUser, loginUser, forgotPasswordUser, resetPasswordUser, verifySignupUser } from "@/api/auth.ts";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot_email" | "forgot_otp">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot_email" | "forgot_otp" | "signup_otp">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [shopName, setShopName] = useState("");
@@ -41,20 +41,40 @@ export default function AuthPage() {
           phone: "",
         });
 
+        if (res.data.needsVerification) {
+          toast.success(res.data.message || "Verification OTP sent to your email");
+          setMode("signup_otp");
+        } else {
+          localStorage.setItem("token", res.data.token);
+          store.setUser(res.data.user);
+          toast.success("Account created successfully");
+          navigate("/dashboard");
+        }
+      } else if (mode === "signup_otp") {
+        const res = await verifySignupUser({ email, otp });
         localStorage.setItem("token", res.data.token);
         store.setUser(res.data.user);
-        toast.success("Account created successfully");
+        toast.success("Email verified and account activated successfully!");
         navigate("/dashboard");
       } else if (mode === "signin") {
-        const res = await loginUser({
-          email,
-          password,
-        });
+        try {
+          const res = await loginUser({
+            email,
+            password,
+          });
 
-        localStorage.setItem("token", res.data.token);
-        store.setUser(res.data.user);
-        toast.success("Login Successful");
-        navigate("/dashboard");
+          localStorage.setItem("token", res.data.token);
+          store.setUser(res.data.user);
+          toast.success("Login Successful");
+          navigate("/dashboard");
+        } catch (err: any) {
+          if (err.response?.data?.needsVerification) {
+            toast.error("Please verify your email address. OTP sent.");
+            setMode("signup_otp");
+          } else {
+            throw err;
+          }
+        }
       } else if (mode === "forgot_email") {
         const res = await forgotPasswordUser({ email });
         toast.success(res.data?.message || "OTP sent to your email");
@@ -97,6 +117,9 @@ export default function AuthPage() {
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">For modern kiranas</div>
           </div>
         </Link>
+        <div>
+          <img src="/analytics.png" alt="" className="w-80  mx-auto" />
+        </div>
 
         <div className="relative z-10 space-y-6 max-w-md">
           <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs font-medium shadow-soft">
@@ -129,12 +152,14 @@ export default function AuthPage() {
             {mode === "signup" && "Create your shop"}
             {mode === "forgot_email" && "Reset Password"}
             {mode === "forgot_otp" && "Verify OTP"}
+            {mode === "signup_otp" && "Verify Your Email"}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             {mode === "signin" && "Sign in to continue to your dashboard."}
             {mode === "signup" && "Get started — no credit card required."}
             {mode === "forgot_email" && "Enter your email to receive a password reset OTP."}
             {mode === "forgot_otp" && "Enter the OTP sent to your email to set a new password."}
+            {mode === "signup_otp" && "Enter the verification OTP sent to your email."}
           </p>
 
           {(mode === "signin" || mode === "signup") && (
@@ -179,7 +204,7 @@ export default function AuthPage() {
               </>
             )}
 
-            {mode !== "forgot_otp" ? (
+            {mode !== "forgot_otp" && mode !== "signup_otp" ? (
               <Input
                 label="Email"
                 type="email"
@@ -223,7 +248,7 @@ export default function AuthPage() {
               </div>
             )}
 
-            {mode === "forgot_otp" && (
+            {(mode === "forgot_otp" || mode === "signup_otp") && (
               <>
                 <Input
                   label="6-Digit OTP"
@@ -232,7 +257,11 @@ export default function AuthPage() {
                   placeholder="123456"
                   required
                 />
+              </>
+            )}
 
+            {mode === "forgot_otp" && (
+              <>
                 <div className="space-y-1.5">
                   <label className="block text-xs font-medium">New Password</label>
                   <div className="relative">
@@ -294,9 +323,10 @@ export default function AuthPage() {
               {mode === "signup" && "Create account"}
               {mode === "forgot_email" && "Send OTP"}
               {mode === "forgot_otp" && "Reset Password"}
+              {mode === "signup_otp" && "Verify Email"}
             </button>
 
-            {(mode === "forgot_email" || mode === "forgot_otp") && (
+            {(mode === "forgot_email" || mode === "forgot_otp" || mode === "signup_otp") && (
               <button
                 type="button"
                 onClick={() => setMode("signin")}

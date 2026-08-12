@@ -13,7 +13,11 @@ const startReorderJob = () => {
     } catch (err) {
       console.error("Cron Job Error:", err.message);
     }
-  });
+  },
+    {
+      timezone: "Asia/Kolkata",
+    }
+  );
 };
 
-export default startReorderJob;
+export default startReorderJob; 

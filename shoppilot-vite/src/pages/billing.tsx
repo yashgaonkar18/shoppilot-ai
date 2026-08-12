@@ -1,17 +1,7 @@
 import { useEffect, useState } from "react";
 import { Check, Sparkles, Zap, Building2, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import axios from "axios";
-
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:5000/api",
-});
-
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import api from "@/api/axios";
 
 const PLANS = [
   {
@@ -96,7 +86,7 @@ export default function BillingPage() {
   const loadCurrentPlan = async () => {
     try {
       setPlanLoading(true);
-      const { data } = await API.get("/auth/profile");
+      const { data } = await api.get("/auth/profile");
       setCurrentPlan(data.user?.plan ?? "starter");
       setPlanExpiresAt(data.user?.plan_expires_at ?? null);
     } catch (err) {
@@ -113,7 +103,7 @@ export default function BillingPage() {
     setLoadingPlan(planKey);
 
     try {
-      const { data } = await API.post("/billing/create-order", { plan: planKey });
+      const { data } = await api.post("/billing/create-order", { plan: planKey });
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -129,7 +119,7 @@ export default function BillingPage() {
           razorpay_signature: string;
         }) => {
           try {
-            await API.post("/billing/verify-payment", {
+            await api.post("/billing/verify-payment", {
               ...response,
               plan: planKey,
             });

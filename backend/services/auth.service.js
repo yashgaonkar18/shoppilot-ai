@@ -1,9 +1,8 @@
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import { generateToken } from "../utils/jwt.js";
-import { sendOTPEmail } from "../utils/email.js";
+import { sendOTPEmail, validateEmailDomain, sendVerificationEmail } from "../utils/email.js";
 
-// Register User
 export const register = async ({
   email,
   password,
@@ -11,26 +10,68 @@ export const register = async ({
   owner_name,
   phone,
 }) => {
-  // Check if user exists
-  const existingUser = await User.findOne({ email });
-
-  if (existingUser) {
-    throw new Error("User already exists");
+  const isDomainValid = await validateEmailDomain(email);
+  if (!isDomainValid) {
+    throw new Error("The email domain does not exist or cannot receive emails");
   }
 
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  let user = await User.findOne({ email });
 
-  // Create user
-  const user = await User.create({
+  if (user) {
+    if (user.isVerified) {
+      throw new Error("User already exists");
+    }
+    // Update existing unverified user details
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.shop_name = shop_name;
+    user.owner_name = owner_name;
+    user.phone = phone || "";
+  } else {
+    // Hash password and create new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user = new User({
+      email,
+      password: hashedPassword,
+      shop_name,
+      owner_name,
+      phone: phone || "",
+      isVerified: false,
+    });
+  }
+
+  // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  user.verificationOTP = otp;
+  user.verificationOTPExpires = Date.now() + 10 * 60 * 1000;
+  await user.save();
+
+  // Send verification email
+  await sendVerificationEmail(email, otp);
+
+  return {
+    needsVerification: true,
+    email: user.email,
+  };
+};
+
+export const verifySignup = async ({ email, otp }) => {
+  const user = await User.findOne({
     email,
-    password: hashedPassword,
-    shop_name,
-    owner_name,
-    phone,
+    verificationOTP: otp,
+    verificationOTPExpires: { $gt: Date.now() },
   });
 
-  // Generate JWT
+  if (!user) {
+    throw new Error("Invalid or expired verification OTP");
+  }
+
+  user.isVerified = true;
+  user.verificationOTP = null;
+  user.verificationOTPExpires = null;
+  await user.save();
+
+  // Generate JWT since verification is successful
   const token = generateToken(user._id);
 
   return {
@@ -45,23 +86,33 @@ export const register = async ({
   };
 };
 
-// Login User
 export const login = async ({ email, password }) => {
-  // Find user
   const user = await User.findOne({ email });
 
   if (!user) {
     throw new Error("Invalid email or password");
   }
 
-  // Compare password
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
     throw new Error("Invalid email or password");
   }
 
-  // Generate JWT
+  // Check if verified
+  if (!user.isVerified) {
+    // Generate new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.verificationOTP = otp;
+    user.verificationOTPExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    // Send new verification email
+    await sendVerificationEmail(user.email, otp);
+
+    throw new Error("Please verify your email address before logging in");
+  }
+
   const token = generateToken(user._id);
 
   return {
@@ -76,7 +127,6 @@ export const login = async ({ email, password }) => {
   };
 };
 
-// Get Profile
 export const getProfile = async (userId) => {
   const user = await User.findById(userId).select("-password");
 
@@ -87,28 +137,29 @@ export const getProfile = async (userId) => {
   return user;
 };
 
-// Forgot Password
 export const forgotPassword = async ({ email }) => {
+  // Validate email domain exists in the world
+  const isDomainValid = await validateEmailDomain(email);
+  if (!isDomainValid) {
+    throw new Error("The email domain does not exist or cannot receive emails");
+  }
+
   const user = await User.findOne({ email });
   if (!user) {
     throw new Error("User with this email does not exist");
   }
 
-  // Generate 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   
-  // Set expiry to 10 minutes
   user.resetOTP = otp;
   user.resetOTPExpires = Date.now() + 10 * 60 * 1000;
   await user.save();
 
-  // Send email
   await sendOTPEmail(user.email, otp);
 
   return { email: user.email };
 };
 
-// Verify OTP
 export const verifyOTP = async ({ email, otp }) => {
   const user = await User.findOne({
     email,
@@ -123,7 +174,6 @@ export const verifyOTP = async ({ email, otp }) => {
   return { success: true };
 };
 
-// Reset Password
 export const resetPassword = async ({ email, otp, newPassword }) => {
   const user = await User.findOne({
     email,
@@ -135,7 +185,6 @@ export const resetPassword = async ({ email, otp, newPassword }) => {
     throw new Error("Invalid or expired OTP");
   }
 
-  // Hash the new password
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   
   user.password = hashedPassword;

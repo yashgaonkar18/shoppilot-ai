@@ -3,6 +3,7 @@ import express from "express";
 import {
   register,
   login,
+  verifySignup,
   getProfile,
   updateProfile,
   forgotPassword,
@@ -16,6 +17,7 @@ import checkPlanExpiry from "../middleware/checkplanexpiry.middleware.js";
 const router = express.Router();
 
 router.post("/register", register);
+router.post("/verify-signup", verifySignup);
 
 router.post("/login", login);
 

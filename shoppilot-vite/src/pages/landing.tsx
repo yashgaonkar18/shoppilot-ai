@@ -18,12 +18,12 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
-const HEADER_OFFSET = 72; // sticky header height + a little breathing room
+const HEADER_OFFSET = 72;
 
 export default function Landing() {
   const { user } = useAuth();
 
-  const scrollToSection = (id:any) => (e:any) => {
+  const scrollToSection = (id: any) => (e: any) => {
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
@@ -34,8 +34,8 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
-      <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-background border border-b">
+        <div className="max-w-5xl   mx-auto px-4 sm:px-6 h-16 flex items-center justify-between  ">
           <Link to="/" className="flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-xl bg-gradient-brand grid place-items-center text-brand-foreground shadow-glow">
               <Store className="h-4 w-4" />
@@ -104,9 +104,7 @@ export default function Landing() {
                 <Link to="/auth" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
                   Start free trial <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/auth" className="inline-flex h-11 items-center px-5 rounded-lg border border-border bg-card font-medium hover:bg-accent">
-                  See demo
-                </Link>
+
               </>
             )}
           </div>
@@ -141,25 +139,29 @@ export default function Landing() {
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Everything you need</div>
             <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">One app to run your shop</h2>
+            <p className="mt-3 text-muted-foreground max-w-lg mx-auto">Built for small retailers — no POS hardware, no learning curve.</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+          <div className="grid md:grid-cols-3 gap-4 [grid-auto-flow:dense]">
             {[
-              { icon: Package, title: "Smart inventory", desc: "Add products, track stock, get low-stock alerts before you run out." },
-              { icon: Receipt, title: "Instant invoices", desc: "Generate a tax invoice with one tap. Print or share over WhatsApp." },
-              { icon: Sparkles, title: "AI Copilot", desc: "Ask in plain English: 'Why did sales drop?' Get grounded, data-backed answers." },
-              { icon: BarChart3, title: "Daily insights", desc: "Fast movers, slow movers, restock suggestions — every morning." },
-              { icon: Bell, title: "Auto alerts", desc: "Nightly agent checks low stock and notifies you the next morning." },
-              { icon: MessageCircle, title: "Customer support (soon)", desc: "WhatsApp bot that answers customer queries from your inventory." },
-              { icon: Smartphone, title: "Mobile-first", desc: "Runs great on any Android phone — no tablet or POS hardware needed." },
-              { icon: ShieldCheck, title: "Secure by default", desc: "Your sales and stock data is encrypted and backed up automatically." },
-              { icon: Zap, title: "Fast onboarding", desc: "Import your existing stock list from Excel or WhatsApp in minutes." },
+              { icon: Package, title: "Smart inventory", desc: "Add products, track stock, get low-stock alerts before you run out.", span: "md:col-span-2", color: "bg-gradient-card" },
+              { icon: Sparkles, title: "AI Copilot", desc: "Ask in plain English: 'Why did sales drop?' Get grounded, data-backed answers.", span: "md:row-span-2", color: "bg-gradient-card" },
+              { icon: Receipt, title: "Instant invoices", desc: "Generate a tax invoice with one tap. Print or share over WhatsApp.", color: "bg-gradient-card" },
+              { icon: BarChart3, title: "Daily insights", desc: "Fast movers, slow movers, restock suggestions — every morning.", color: "bg-gradient-card" },
+              { icon: Bell, title: "Auto alerts", desc: "Nightly agent checks low stock and notifies you the next morning.", color: "bg-gradient-card" },
+              { icon: Smartphone, title: "Mobile-first", desc: "Runs great on any Android phone — no tablet or POS hardware needed.", span: "md:col-span-2", color: "bg-gradient-card" },
             ].map((f) => (
-              <div key={f.title} className="rounded-2xl border border-border bg-gradient-card p-5 shadow-soft hover:shadow-glow transition-shadow">
-                <div className="h-10 w-10 rounded-lg bg-accent grid place-items-center text-accent-foreground">
-                  <f.icon className="h-4 w-4" />
+              <div
+                key={f.title}
+                className={`group relative rounded-2xl p-6 flex flex-col text-black border-[0.4vmin] border-[#00a263] shadow-[0.4rem_0.4rem_0_#00a263] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0.55rem_0.55rem_0_#00a263] ${f.span ?? ""} ${f.color}`}
+              >
+                <div className="h-11 w-11 rounded-xl bg-[#00a263] grid place-items-center transition-transform duration-300 group-hover:scale-110">
+                  <f.icon className="h-5 w-5 text-white" />
                 </div>
-                <h3 className="mt-4 font-semibold">{f.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
+                <h3 className="mt-4 font-bold text-base text-[#05060f]">{f.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-[#05060f] opacity-80">
+                  {f.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -179,7 +181,7 @@ export default function Landing() {
               { step: "02", title: "Add your products", desc: "Type them in, import from Excel, or snap a photo of your stock register." },
               { step: "03", title: "Let Copilot take over", desc: "Get daily insights, alerts, and answers to your business questions automatically." },
             ].map((s) => (
-              <div key={s.step} className="relative rounded-2xl border border-border bg-card p-6 shadow-soft">
+              <div key={s.step} className="group relative rounded-2xl p-6 flex flex-col text-black border-[0.4vmin] border-[#00a263] shadow-[0.4rem_0.4rem_0_#00a263] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0.55rem_0.55rem_0_#00a263]">
                 <div className="text-4xl font-bold text-brand/20">{s.step}</div>
                 <h3 className="mt-3 font-semibold">{s.title}</h3>
                 <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
@@ -276,11 +278,10 @@ export default function Landing() {
             ].map((p) => (
               <div
                 key={p.name}
-                className={`rounded-2xl border p-6 shadow-soft ${
-                  p.highlight
-                    ? "border-brand bg-gradient-card shadow-glow relative"
-                    : "border-border bg-card"
-                }`}
+                className={`rounded-2xl border p-6 shadow-soft ${p.highlight
+                  ? "border-brand bg-gradient-card shadow-glow relative"
+                  : "border-border bg-card"
+                  }`}
               >
                 {p.highlight && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-semibold px-3 py-1 rounded-full bg-gradient-brand text-brand-foreground shadow-glow">
@@ -297,11 +298,10 @@ export default function Landing() {
                 </ul>
                 <Link
                   to="/auth"
-                  className={`mt-6 inline-flex w-full h-10 items-center justify-center rounded-lg text-sm font-medium ${
-                    p.highlight
-                      ? "bg-gradient-brand text-brand-foreground shadow-glow hover:opacity-95"
-                      : "border border-border bg-card hover:bg-accent"
-                  }`}
+                  className={`mt-6 inline-flex w-full h-10 items-center justify-center rounded-lg text-sm font-medium ${p.highlight
+                    ? "bg-gradient-brand text-brand-foreground shadow-glow hover:opacity-95"
+                    : "border border-border bg-card hover:bg-accent"
+                    }`}
                 >
                   Choose {p.name}
                 </Link>
@@ -337,38 +337,61 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">Start in 2 minutes. Free during beta.</h2>
-          <p className="mt-3 text-muted-foreground">Join the shops already moving their inventory and sales onto ShopPilot.</p>
-          {user ? (
-            <div className="flex flex-col items-center gap-3 mt-6">
-              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-                <UserIcon className="h-4 w-4 text-brand animate-pulse" />
-                Logged in as <span className="font-semibold text-foreground">{user.owner_name || user.shop_name}</span>
-              </span>
-              <Link to="/dashboard" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
-                Go to Dashboard <ArrowRight className="h-4 w-4" />
-              </Link>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-brand px-8 sm:px-12 py-14 sm:py-16 flex flex-col sm:flex-row items-center justify-between gap-10">
+            <div className="relative z-10 max-w-md text-center sm:text-left">
+              <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-[1.1]">
+                Start in 2 minutes.
+                <br />
+                Free during beta.
+              </h2>
+              <p className="mt-4 text-sm sm:text-base text-white/60">
+                Join the shops already moving their inventory and sales onto ShopPilot.
+              </p>
+
+              {user ? (
+                <div className="mt-8 flex flex-col items-center sm:items-start gap-3">
+                  <span className="inline-flex items-center gap-1.5 text-sm font-medium text-white/70">
+                    <UserIcon className="h-4 w-4 text-brand animate-pulse" />
+                    Logged in as <span className="font-semibold text-white">{user.owner_name || user.shop_name}</span>
+                  </span>
+                  <Link
+                    to="/dashboard"
+                    className="inline-flex h-11 items-center gap-1.5 px-6 rounded-full bg-white text-[#0b2a55] font-semibold hover:bg-white/90 transition-colors"
+                  >
+                    Go to Dashboard <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="mt-8 inline-flex h-11 items-center px-6 rounded-full bg-white text-[#0b2a55] font-semibold hover:bg-white/90 transition-colors"
+                >
+                  Get Started Free
+                </Link>
+              )}
             </div>
-          ) : (
-            <Link to="/auth" className="mt-6 inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
-              Create your shop <ArrowRight className="h-4 w-4" />
-            </Link>
-          )}
+
+            <div className="relative z-10 shrink-0 w-56 sm:w-72">
+              <img src="/analytics.png" alt="ShopPilot mascot" className="w-full h-auto" />
+            </div>
+
+
+            <div className="absolute -right-10 -bottom-16 h-72 w-72 sm:h-96 sm:w-96 rounded-full bg-white/5 blur-2xl" />
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-border py-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t  ">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 mt-10">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-lg bg-gradient-brand grid place-items-center text-brand-foreground">
               <Store className="h-3.5 w-3.5" />
             </div>
             <span className="text-sm font-medium">ShopPilot AI</span>
           </div>
-          <div className="flex gap-6 text-xs text-muted-foreground">
+          <div className="flex  gap-6 text-xs text-muted-foreground">
             <a href="#features" onClick={scrollToSection("features")} className="hover:text-foreground">Features</a>
             <a href="#pricing" onClick={scrollToSection("pricing")} className="hover:text-foreground">Pricing</a>
             <a href="#faq" onClick={scrollToSection("faq")} className="hover:text-foreground">FAQ</a>
@@ -376,6 +399,11 @@ export default function Landing() {
           <div className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} ShopPilot AI · Made in India 🇮🇳
           </div>
+        </div>
+        <div className="text-center mt-8">
+          <h1 className="font-bold sm:text-[200px] text-[40px] bg-gradient-to-t from-white via-[#00a263] to-[#00a263] bg-clip-text text-transparent">
+            ShopPilot AI
+          </h1>
         </div>
       </footer>
     </div>

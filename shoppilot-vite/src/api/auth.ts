@@ -13,12 +13,14 @@ export interface LoginData {
   password: string;
 }
 
-// Register
 export const registerUser = (data: RegisterData) => {
   return api.post("/auth/register", data);
 };
 
-// Login
+export const verifySignupUser = (data: { email: string; otp: string }) => {
+  return api.post("/auth/verify-signup", data);
+};
+
 export const loginUser = (data: LoginData) => {
   return api.post("/auth/login", data);
 };
@@ -43,7 +45,6 @@ export const updateProfile = (data: {
   phone: string;
 }) => api.put("/auth/profile", data, authHeader());
 
-// Forgot Password API helper calls
 export const forgotPasswordUser = (data: { email: string }) => {
   return api.post("/auth/forgot-password", data);
 };

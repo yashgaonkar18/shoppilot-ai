@@ -7,7 +7,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Account created successfully",
+      message: "Verification OTP sent to your email",
       ...result,
     });
   } catch (error) {
@@ -18,6 +18,22 @@ export const register = async (req, res) => {
   }
 };
 
+export const verifySignup = async (req, res) => {
+  try {
+    const result = await authService.verifySignup(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified and account activated successfully",
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 export const login = async (req, res) => {
   try {
@@ -29,6 +45,13 @@ export const login = async (req, res) => {
       ...result,
     });
   } catch (error) {
+    if (error.message === "Please verify your email address before logging in") {
+      return res.status(403).json({
+        success: false,
+        needsVerification: true,
+        message: error.message,
+      });
+    }
     res.status(401).json({
       success: false,
       message: error.message,
