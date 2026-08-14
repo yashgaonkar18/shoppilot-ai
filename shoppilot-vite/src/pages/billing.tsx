@@ -35,7 +35,7 @@ const PLANS = [
   {
     key: "business",
     name: "Business",
-    price: 999,
+    price: 799,
     icon: Building2,
     tagline: "Multi-staff",
     features: [

@@ -15,13 +15,36 @@ import {
   Zap,
   Quote,
   ChevronDown,
+  Github,
+  Twitter,
+  Linkedin,
+  Send,
+  Heart,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { gsap } from "gsap";
+import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
+import { useEffect } from "react";
+
 
 const HEADER_OFFSET = 72;
 
 export default function Landing() {
   const { user } = useAuth();
+  gsap.registerPlugin(ScrambleTextPlugin)
+
+  useEffect(() => {
+    const el = document.querySelector(".scramble-word");
+    if (!el) return;
+
+    gsap.to(el, {
+      scrollTrigger: { trigger: el, start: "top 85%" },
+      duration: 1.5,
+      scrambleText: { text: "AI business manager", chars: "XO", revealDelay: 0.6, speed: 0.8 },
+    });
+  }, []);
+
 
   const scrollToSection = (id: any) => (e: any) => {
     e.preventDefault();
@@ -77,116 +100,245 @@ export default function Landing() {
       </header>
 
       {/* Hero */}
-      <section className="relative bg-gradient-hero overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border px-3 py-1 text-xs font-medium shadow-soft">
-            <Sparkles className="h-3 w-3 text-brand" /> AI Copilot built in
+      <section className="relative bg-gradient-hero overflow-hidden pt-12 pb-24">
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
+        <div className="hero-mesh-glow" />
+
+        <div className="absolute top-[40%] left-6 xl:left-16 -translate-y-1/2 hidden lg:block pointer-events-none select-none max-w-[240px] xl:max-w-[285px] z-10 animate-float-slow">
+          <div className="relative p-2 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl">
+            <img src="/hero1.png" alt="ShopPilot UI Preview 1" className="rounded-xl w-full h-auto" />
+            <div className="absolute -inset-0.5 rounded-2xl bg-gradient-brand opacity-5 blur-sm -z-10" />
           </div>
-          <h1 className="mt-5 text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.05] max-w-3xl mx-auto">
-            Your shop's <span className="text-brand">AI business manager</span>, working 24/7.
+        </div>
+
+        <div className="absolute top-[40%] right-6 xl:right-16 -translate-y-1/2 hidden lg:block pointer-events-none select-none max-w-[240px] xl:max-w-[285px] z-10 animate-float-delayed">
+          <div className="relative p-2 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl">
+            <img src="/hero2.png" alt="ShopPilot UI Preview 2" className="rounded-xl w-full h-auto" />
+            <div className="absolute -inset-0.5 rounded-2xl bg-gradient-brand opacity-5 blur-sm -z-10" />
+          </div>
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-brand/5 border border-brand/20 px-4 py-1.5 text-xs font-semibold text-brand shadow-sm animate-pulse-subtle">
+            <Sparkles className="h-3.5 w-3.5 text-brand" />
+            <span>AI Copilot built-in for kirana & retail shops</span>
+          </div>
+
+          <h1 className="mt-6 text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] max-w-4xl mx-auto text-foreground">
+            Your shop's <span className="text-brand scramble-word">AI business manager</span>, working 24/7.
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
-            ShopPilot tracks inventory, generates invoices, and gives daily AI insights — built for Indian kirana, medical, and retail shops.
+
+          <p className="mt-6 text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            ShopPilot tracks inventory, generates invoices, and gives daily AI insights — custom built for Indian retail merchants.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-2.5">
+
+          <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
             {user ? (
               <div className="flex flex-col items-center gap-3">
-                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground bg-accent/40 px-3 py-1.5 rounded-full border border-border">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground bg-accent/40 px-3.5 py-1.5 rounded-full border border-border">
                   <UserIcon className="h-4 w-4 text-brand animate-pulse" />
                   Welcome back, <span className="font-semibold text-foreground">{user.owner_name || user.shop_name}</span>
                 </span>
-                <Link to="/dashboard" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
+                <Link to="/dashboard" className="inline-flex h-12 items-center gap-2 px-6 rounded-xl bg-gradient-brand text-brand-foreground font-semibold shadow-lg hover:shadow-brand/20 hover:-translate-y-0.5 transition-all duration-300">
                   Go to Dashboard <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             ) : (
               <>
-                <Link to="/auth" className="inline-flex h-11 items-center gap-1.5 px-5 rounded-lg bg-gradient-brand text-brand-foreground font-medium shadow-glow hover:opacity-95">
-                  Start free trial <ArrowRight className="h-4 w-4" />
+                <Link to="/auth" className="inline-flex h-12 items-center gap-2 px-6 rounded-xl bg-gradient-brand text-brand-foreground font-semibold shadow-lg hover:shadow-brand/20 hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto justify-center">
+                  Start Free Trial <ArrowRight className="h-4 w-4" />
                 </Link>
-
+                <a href="#demo" onClick={scrollToSection("demo")} className="inline-flex h-12 items-center gap-2 px-6 rounded-xl border border-border bg-card/80 backdrop-blur-sm text-foreground font-semibold shadow-sm hover:bg-accent hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto justify-center">
+                  See Demo
+                </a>
               </>
             )}
           </div>
-          <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1"><Check className="h-3.5 w-3.5 text-success" /> No credit card</span>
-            <span className="inline-flex items-center gap-1"><Check className="h-3.5 w-3.5 text-success" /> Setup in 2 minutes</span>
-            <span className="inline-flex items-center gap-1"><Check className="h-3.5 w-3.5 text-success" /> Works on any phone</span>
+
+          <div className="mt-12 flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-xs sm:text-sm text-muted-foreground border-t border-border/40 pt-8 max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-brand shrink-0" /> No credit card required</span>
+            <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-brand shrink-0" /> Setup in 2 minutes</span>
+            <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-brand shrink-0" /> Works on any smartphone</span>
           </div>
         </div>
+
+        {/* Demo App Preview */}
+        <section id="demo" className="relative z-10 px-4 sm:px-6 pb-4">
+          <div className="relative mx-auto max-w-5xl">
+            <div className="group relative rounded-2xl border border-border bg-card/50 p-2 backdrop-blur-sm shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/30">
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-brand opacity-15 blur-xl group-hover:opacity-25 transition duration-500" />
+
+              <div className="relative z-10 flex items-center justify-between border-b border-border/60 bg-muted/50 px-4 py-3 rounded-t-xl">
+                <div className="flex gap-1.5">
+                  <span className="h-3 w-3 rounded-full bg-red-500/80" />
+                  <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
+                  <span className="h-3 w-3 rounded-full bg-green-500/80" />
+                </div>
+                <div className="flex items-center gap-2 rounded bg-background px-3 py-1 text-[11px] text-muted-foreground border border-border/40 w-1/3 max-w-[240px] justify-center select-none font-mono">
+                  <Store className="h-3 w-3 text-brand" /> app.shoppilot.ai
+                </div>
+                <div className="w-12" />
+              </div>
+
+              <div className="relative overflow-hidden rounded-b-xl border-t border-border/60">
+                <img
+                  src="/demoimg.png"
+                  alt="ShopPilot App Dashboard Preview"
+                  className="w-full h-auto object-cover object-top max-h-[600px] transition-transform duration-700 group-hover:scale-[1.005]"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
 
       {/* Stats bar */}
-      <section className="border-y border-border bg-card/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
-          {[
-            { value: "2,400+", label: "Shops onboarded" },
-            { value: "₹18Cr+", label: "Inventory tracked" },
-            { value: "45,000+", label: "Invoices generated" },
-            { value: "4.8/5", label: "Average rating" },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-brand">{s.value}</div>
-              <div className="mt-1 text-xs sm:text-sm text-muted-foreground">{s.label}</div>
-            </div>
-          ))}
+      <section className="relative z-20 -mt-16 px-4 sm:px-6 max-w-6xl mx-auto">
+        <div className="rounded-[14px] border border-border/80 bg-card/80 backdrop-blur-lg shadow-xl p-6 sm:p-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 divide-y lg:divide-y-0 lg:divide-x divide-border/60">
+            {[
+              { value: "2,400+", label: "Shops onboarded" },
+              { value: "₹18Cr+", label: "Inventory tracked" },
+              { value: "45,000+", label: "Invoices generated" },
+              { value: "4.8/5", label: "Average rating" },
+            ].map((s, index) => (
+              <div
+                key={s.label}
+                className={`flex flex-col items-center justify-center text-center p-2 transition-transform duration-300 hover:scale-105 ${index >= 2 ? "pt-6 lg:pt-2" : ""
+                  } ${index % 2 === 1 ? "border-l-0" : ""
+                  }`}
+              >
+                <div className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-brand bg-clip-text text-transparent">
+                  {s.value}
+                </div>
+                <div className="mt-2.5 text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Feature grid */}
-      <section id="features" className="py-20 scroll-mt-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <div className="text-xs font-semibold uppercase tracking-wider text-brand">Everything you need</div>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">One app to run your shop</h2>
-            <p className="mt-3 text-muted-foreground max-w-lg mx-auto">Built for small retailers — no POS hardware, no learning curve.</p>
+      <section id="features" className="py-24 scroll-mt-20 relative bg-background">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/5 border border-brand/20 px-3.5 py-1.5 text-xs font-semibold text-brand tracking-wider uppercase">
+              Everything you need
+            </div>
+            <h2 className="mt-4 text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+              One app to run your entire shop
+            </h2>
+            <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              Built specifically for Indian retail merchants — no POS hardware, no complex learning curve.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 [grid-auto-flow:dense]">
+          <div className="grid md:grid-cols-3 gap-6 [grid-auto-flow:dense]">
             {[
-              { icon: Package, title: "Smart inventory", desc: "Add products, track stock, get low-stock alerts before you run out.", span: "md:col-span-2", color: "bg-gradient-card" },
-              { icon: Sparkles, title: "AI Copilot", desc: "Ask in plain English: 'Why did sales drop?' Get grounded, data-backed answers.", span: "md:row-span-2", color: "bg-gradient-card" },
-              { icon: Receipt, title: "Instant invoices", desc: "Generate a tax invoice with one tap. Print or share over WhatsApp.", color: "bg-gradient-card" },
-              { icon: BarChart3, title: "Daily insights", desc: "Fast movers, slow movers, restock suggestions — every morning.", color: "bg-gradient-card" },
-              { icon: Bell, title: "Auto alerts", desc: "Nightly agent checks low stock and notifies you the next morning.", color: "bg-gradient-card" },
-              { icon: Smartphone, title: "Mobile-first", desc: "Runs great on any Android phone — no tablet or POS hardware needed.", span: "md:col-span-2", color: "bg-gradient-card" },
+              { title: "Smart inventory", desc: "Add products, track stock, get low-stock alerts before you run out.", span: "md:col-span-2", image: "/inventory.png", class: "absolute right-4 bottom-10 w-18 md:right-6 md:bottom-4 md:w-32" },
+              { title: "AI Copilot", desc: "Ask in plain English: 'Why did sales drop?' Get grounded, data-backed answers.", span: "md:row-span-2", image: "/copilot.png", class: "absolute right-4 bottom-10 w-18 md:right-26 md:bottom-17 md:w-32" },
+              { title: "Instant invoices", desc: "Generate a tax invoice with one tap. Print or share over WhatsApp.", span: "md:row-span-2", image: "/receipt.png", class: "absolute right-4 bottom-10 w-18 md:right-26 md:bottom-17 md:w-32" },
+              { title: "Daily insights", desc: "Fast movers, slow movers, restock suggestions — every morning.", image: "/chart.png", class: "absolute right-2 bottom-10 w-17  md:w-20" },
+              { title: "Auto alerts", desc: "Nightly agent checks low stock and notifies you the next morning.", span: "md:col-span-2", image: "/commercial.png", class: "absolute right-4 bottom-8 w-18 md:right-6 md:bottom-4 md:w-32" },
             ].map((f) => (
               <div
                 key={f.title}
-                className={`group relative rounded-2xl p-6 flex flex-col text-black border-[0.4vmin] border-[#00a263] shadow-[0.4rem_0.4rem_0_#00a263] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0.55rem_0.55rem_0_#00a263] ${f.span ?? ""} ${f.color}`}
+                className={`group relative overflow-hidden rounded-2xl p-6 sm:p-8 flex flex-col premium-card bg-card border border-border shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-xl ${f.span ?? ""}`}
               >
-                <div className="h-11 w-11 rounded-xl bg-[#00a263] grid place-items-center transition-transform duration-300 group-hover:scale-110">
-                  <f.icon className="h-5 w-5 text-white" />
-                </div>
-                <h3 className="mt-4 font-bold text-base text-[#05060f]">{f.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-[#05060f] opacity-80">
-                  {f.desc}
-                </p>
+                <div className="absolute -inset-px rounded-2xl bg-gradient-brand opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 pointer-events-none" />
+                <h3 className="mt-5 font-bold text-[30px] text-foreground tracking-tight">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground z-1">{f.desc}</p>
+                <img src={f.image} alt="" className={f.class} />
               </div>
             ))}
           </div>
         </div>
+        <div className="absolute  -top-25 h-2 w-full bg-[#76d9b5] " />
+        {/* <div className="md:absolute  md:ml-10 md:-top-25 w-2 h-140 bg-[#76d9b5] " />
+        <div className="md:absolute  md:ml-20 md:-top-25 w-2 h-120 bg-[#76d9b5] " />
+        <div className="md:absolute md:ml-30 md:-top-25 w-2 h-100 bg-[#76d9b5] " />
+        <div className="md:absolute  md:ml-40 md:-top-25 w-2 h-80 bg-[#76d9b5] " />
+        <div className="md:absolute  md:ml-50 md:-top-25 w-2 h-60 bg-[#76d9b5] " />
+        <div className="md:absolute  md:ml-60 md:-top-25 w-2 h-40 bg-[#76d9b5] " />
+        <div className="md:absolute  md:ml-70 md:-top-25 w-2 h-30 bg-[#76d9b5] " />
+
+        <div className="md:absolute right-0  md:mr-10 md:-top-25 w-2 h-140 bg-[#76d9b5] " />
+        <div className="md:absolute right-0  md:mr-20 md:-top-25 w-2 h-120 bg-[#76d9b5] " />
+        <div className="md:absolute right-0  md:mr-30 md:-top-25 w-2 h-100 bg-[#76d9b5] " />
+        <div className="md:absolute right-0  md:mr-40 md:-top-25 w-2 h-80 bg-[#76d9b5] " />
+        <div className="md:absolute right-0  md:mr-50 md:-top-25 w-2 h-60 bg-[#76d9b5] " />
+        <div className="md:absolute right-0  md:mr-60 md:-top-25 w-2 h-40 bg-[#76d9b5] " />
+        <div className="md:absolute right-0  md:mr-70 md:-top-25 w-2 h-30 bg-[#76d9b5] " /> */}
+
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="py-20 bg-secondary/40 scroll-mt-20">
+      <section id="how-it-works" className="py-24 bg-secondary/30 scroll-mt-20 border-y border-border/40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <div className="text-xs font-semibold uppercase tracking-wider text-brand">Getting started</div>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">Up and running in 3 steps</h2>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/5 border border-brand/20 px-3.5 py-1.5 text-xs font-semibold text-brand tracking-wider uppercase">
+              Getting started
+            </div>
+            <h2 className="mt-4 text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+              Up and running in 3 steps
+            </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
-              { step: "01", title: "Create your shop", desc: "Sign up with your phone number and shop name — no paperwork needed." },
-              { step: "02", title: "Add your products", desc: "Type them in, import from Excel, or snap a photo of your stock register." },
-              { step: "03", title: "Let Copilot take over", desc: "Get daily insights, alerts, and answers to your business questions automatically." },
-            ].map((s) => (
-              <div key={s.step} className="group relative rounded-2xl p-6 flex flex-col text-black border-[0.4vmin] border-[#00a263] shadow-[0.4rem_0.4rem_0_#00a263] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0.55rem_0.55rem_0_#00a263]">
-                <div className="text-4xl font-bold text-brand/20">{s.step}</div>
-                <h3 className="mt-3 font-semibold">{s.title}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
-              </div>
-            ))}
+              { 
+                step: "01", 
+                title: "Create your shop", 
+                desc: "Sign up with your phone number and shop name — no paperwork needed.",
+                icon: Store,
+                color: "text-blue-500 bg-blue-500/10 dark:bg-blue-500/20"
+              },
+              { 
+                step: "02", 
+                title: "Add your products", 
+                desc: "Type them in, import from Excel, or snap a photo of your stock register.",
+                icon: Package,
+                color: "text-amber-500 bg-amber-500/10 dark:bg-amber-500/20"
+              },
+              { 
+                step: "03", 
+                title: "Let Copilot take over", 
+                desc: "Get daily insights, alerts, and answers to your business questions automatically.",
+                icon: Sparkles,
+                color: "text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20"
+              },
+            ].map((s, index) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.step}
+                  className="group relative rounded-2xl p-6 sm:p-8 flex flex-col premium-card bg-card border border-border shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-xl"
+                >
+                  <div className="absolute -inset-px rounded-2xl bg-gradient-brand opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 pointer-events-none" />
+                  
+                  {/* Step Header with Number & Icon */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-4xl font-extrabold text-muted-foreground/20 group-hover:text-brand/30 transition-colors duration-300 font-mono select-none">
+                      {s.step}
+                    </span>
+                    <div className={`h-10 w-10 rounded-xl ${s.color} grid place-items-center shadow-inner transition-transform duration-300 group-hover:scale-110`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                  </div>
+
+                  <h3 className="mt-6 font-bold text-lg text-foreground tracking-tight">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+
+                  {/* Desktop connector arrow */}
+                  {index < 2 && (
+                    <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background shadow-soft text-muted-foreground transition-transform duration-300 group-hover:translate-x-3/4">
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -222,8 +374,8 @@ export default function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-secondary/40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <section className="relative py-20 bg-secondary/40">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Loved by shop owners</div>
             <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">What shopkeepers are saying</h2>
@@ -243,6 +395,7 @@ export default function Landing() {
             ))}
           </div>
         </div>
+
       </section>
 
       {/* Pricing */}
@@ -383,25 +536,160 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="border-t  ">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 mt-10">
-          <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-gradient-brand grid place-items-center text-brand-foreground">
-              <Store className="h-3.5 w-3.5" />
+      <footer className="relative border-t border-border bg-card/40 pt-16 pb-8 overflow-hidden">
+        {/* Ambient Glows */}
+        <div className="absolute left-1/4 bottom-0 -z-10 h-80 w-80 rounded-full bg-brand/5 blur-3xl" />
+        <div className="absolute right-1/4 top-0 -z-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 pb-12">
+            
+            {/* Column 1: Brand details */}
+            <div className="lg:col-span-2 space-y-4">
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-lg bg-gradient-brand grid place-items-center text-brand-foreground shadow-glow">
+                  <Store className="h-4 w-4" />
+                </div>
+                <span className="text-lg font-bold tracking-tight bg-gradient-brand bg-clip-text text-transparent">
+                  ShopPilot AI
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
+                Empowering Indian retail merchants and kirana shops with smart invoicing, real-time inventory tracking, and custom daily AI insights.
+              </p>
+              
+              {/* Social links */}
+              <div className="flex items-center gap-3 pt-2">
+                {[
+                  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
+                  { icon: Github, href: "https://github.com", label: "GitHub" },
+                  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+                ].map((social, i) => {
+                  const Icon = social.icon;
+                  return (
+                    <a
+                      key={i}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all duration-200 hover:border-brand/40 hover:text-brand hover:shadow-soft"
+                      aria-label={social.label}
+                    >
+                      <Icon className="h-4 w-4 transition-transform group-hover:scale-110" />
+                    </a>
+                  );
+                })}
+              </div>
             </div>
-            <span className="text-sm font-medium">ShopPilot AI</span>
+
+            {/* Column 2: Product */}
+            <div className="space-y-3.5">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/80">Product</h4>
+              <ul className="space-y-2 text-sm">
+                {[
+                  { label: "Features", href: "features" },
+                  { label: "App Demo", href: "demo" },
+                  { label: "Pricing", href: "pricing" },
+                ].map((link, i) => (
+                  <li key={i}>
+                    <a
+                      href={`#${link.href}`}
+                      onClick={scrollToSection(link.href)}
+                      className="text-muted-foreground hover:text-brand transition-colors duration-150"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column 3: Resources */}
+            <div className="space-y-3.5">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/80">Resources</h4>
+              <ul className="space-y-2 text-sm">
+                {[
+                  { label: "FAQ", href: "faq" },
+                  { label: "Support & Help", href: "#" },
+                  { label: "Beta Program", href: "#" },
+                  { label: "Terms of Service", href: "#" },
+                ].map((link, i) => (
+                  <li key={i}>
+                    <a
+                      href={link.href.startsWith("#") ? link.href : `#${link.href}`}
+                      onClick={link.href.startsWith("#") ? undefined : scrollToSection(link.href)}
+                      className="text-muted-foreground hover:text-brand transition-colors duration-150"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column 4: Newsletter subscription */}
+            <div className="space-y-3.5">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/80">Stay Updated</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Subscribe to get daily tips on growing your retail shop.
+              </p>
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const target = e.currentTarget;
+                  const emailInput = target.elements.namedItem("email") as HTMLInputElement;
+                  if (emailInput && emailInput.value) {
+                    toast.success(`Subscribed successfully with ${emailInput.value}!`);
+                    emailInput.value = "";
+                  } else {
+                    toast.error("Please enter a valid email address.");
+                  }
+                }}
+                className="flex items-center gap-1.5 pt-1"
+              >
+                <div className="relative w-full">
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email address"
+                    required
+                    className="w-full h-9 rounded-lg border border-border bg-card/60 px-3 pr-10 text-xs focus:border-brand focus:outline-none placeholder:text-muted-foreground/60 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-1 top-1 bottom-1 px-2.5 rounded-md bg-gradient-brand text-brand-foreground hover:opacity-95 transition-opacity grid place-items-center cursor-pointer"
+                    aria-label="Subscribe"
+                  >
+                    <Send className="h-3 w-3" />
+                  </button>
+                </div>
+              </form>
+            </div>
+
           </div>
-          <div className="flex  gap-6 text-xs text-muted-foreground">
-            <a href="#features" onClick={scrollToSection("features")} className="hover:text-foreground">Features</a>
-            <a href="#pricing" onClick={scrollToSection("pricing")} className="hover:text-foreground">Pricing</a>
-            <a href="#faq" onClick={scrollToSection("faq")} className="hover:text-foreground">FAQ</a>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} ShopPilot AI · Made in India 🇮🇳
+
+          {/* Bottom row */}
+          <div className="border-t border-border/60 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+            <div>
+              © {new Date().getFullYear()} ShopPilot AI. All rights reserved.
+            </div>
+            <div className="flex items-center gap-1">
+              <span>Made with</span>
+              <Heart className="h-3 w-3 text-rose-500 fill-rose-500 animate-pulse" />
+              <span>in India 🇮🇳</span>
+            </div>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="group flex items-center gap-1 hover:text-brand transition-colors cursor-pointer"
+            >
+              Back to top
+              <ArrowRight className="h-3 w-3 -rotate-90 transition-transform group-hover:-translate-y-0.5" />
+            </button>
           </div>
         </div>
-        <div className="text-center mt-8">
-          <h1 className="font-bold sm:text-[200px] text-[40px] bg-gradient-to-t from-white via-[#00a263] to-[#00a263] bg-clip-text text-transparent">
+
+        <div className="text-center mt-12 select-none pointer-events-none ">
+          <h1 className="font-extrabold text-[100px] sm:text-[200px] leading-none bg-gradient-to-t from-white via-[#00bd78] to-[#00bd78] bg-clip-text text-transparent">
             ShopPilot AI
           </h1>
         </div>
