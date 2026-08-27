@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { gsap } from "gsap";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect } from "react";
 
 
@@ -28,7 +29,7 @@ const HEADER_OFFSET = 72;
 
 export default function Landing() {
   const { user } = useAuth();
-  gsap.registerPlugin(ScrambleTextPlugin)
+  gsap.registerPlugin(ScrambleTextPlugin, ScrollTrigger);
 
   useEffect(() => {
     const el = document.querySelector(".scramble-word");
@@ -41,6 +42,57 @@ export default function Landing() {
     });
   }, []);
 
+  // Scroll-triggered fade/slide-up reveal for every section
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const sections = gsap.utils.toArray(".reveal-section");
+
+      sections.forEach((section) => {
+        gsap.fromTo(
+          section,
+          { autoAlpha: 0, y: 60 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 85%",
+              end: "bottom 20%",
+              toggleActions: "play none none reverse",
+              // markers: true, // uncomment for debugging
+            },
+          }
+        );
+      });
+
+      // Stagger the feature/step/testimonial/pricing cards inside their sections
+      const cardGroups = gsap.utils.toArray(".reveal-card-group");
+      cardGroups.forEach((group) => {
+        const cards = group.querySelectorAll(".reveal-card");
+        if (!cards.length) return;
+        gsap.fromTo(
+          cards,
+          { autoAlpha: 0, y: 40 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            stagger: 0.12,
+            scrollTrigger: {
+              trigger: group,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   const scrollToSection = (id: any) => (e: any) => {
     e.preventDefault();
@@ -93,7 +145,7 @@ export default function Landing() {
         </div>
       </header>
 
-      <section className="relative bg-gradient-hero overflow-hidden pt-12 pb-24">
+      <section className="reveal-section relative bg-gradient-hero overflow-hidden pt-12 pb-24">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="hero-mesh-glow" />
 
@@ -155,7 +207,7 @@ export default function Landing() {
           </div>
         </div>
 
-        <section id="demo" className="relative z-10 px-4 sm:px-6 pb-4">
+        <section id="demo" className="reveal-section relative z-10 px-4 sm:px-6 pb-4">
           <div className="relative mx-auto max-w-5xl">
             <div className="group relative rounded-2xl border border-border bg-card/50 p-2 backdrop-blur-sm shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/30">
               <div className="absolute -inset-1 rounded-2xl bg-gradient-brand opacity-15 blur-xl group-hover:opacity-25 transition duration-500" />
@@ -184,35 +236,7 @@ export default function Landing() {
         </section>
       </section>
 
-      {/* <section className="relative z-20    sm:px-6  mx-auto flex items-center justify-center bg-secondary">
-          <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
-        <div className="rounded-[20px] border border-border/80 bg-card/80 max-w-5xl backdrop-blur-lg shadow-xl p-6 sm:p-10 mt-2 relative">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 divide-y lg:divide-y-0 lg:divide-x divide-border/60">
-            {[
-              { value: "2,400+", label: "Shops onboarded" },
-              { value: "₹18Cr+", label: "Inventory tracked" },
-              { value: "45,000+", label: "Invoices generated" },
-              { value: "4.8/5", label: "Average rating" },
-            ].map((s, index) => (
-              <div
-                key={s.label}
-                className={`flex flex-col items-center justify-center text-center p-2 transition-transform duration-300 hover:scale-105 ${index >= 2 ? "pt-6 lg:pt-2" : ""
-                  } ${index % 2 === 1 ? "border-l-0" : ""
-                  }`}
-              >
-                <div className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-brand bg-clip-text text-transparent">
-                  {s.value}
-                </div>
-                <div className="mt-2.5 text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      <section id="features" className="py-24 scroll-mt-20 relative bg-secondary ">
+      <section id="features" className="reveal-section py-24 scroll-mt-20 relative bg-secondary ">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center mb-16">
@@ -227,7 +251,7 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 [grid-auto-flow:dense]">
+          <div className="reveal-card-group grid md:grid-cols-3 gap-6 [grid-auto-flow:dense]">
             {[
               { title: "Smart inventory", desc: "Add products, track stock, get low-stock alerts before you run out.", span: "md:col-span-2", image: "/inventory.png", class: "absolute right-4 bottom-10 w-18 md:right-6 md:bottom-4 md:w-32" },
               { title: "AI Copilot", desc: "Ask in plain English: 'Why did sales drop?' Get grounded, data-backed answers.", span: "md:row-span-2", image: "/copilot.png", class: "absolute right-4 bottom-10 w-18 md:right-26 md:bottom-17 md:w-32" },
@@ -237,11 +261,11 @@ export default function Landing() {
             ].map((f) => (
               <div
                 key={f.title}
-                className={`group relative overflow-hidden rounded-2xl p-6 sm:p-8 flex flex-col premium-card bg-card border border-border shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-xl ${f.span ?? ""}`}
+                className={`reveal-card group relative overflow-hidden rounded-2xl p-6 sm:p-8 flex flex-col premium-card bg-card border border-border shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-xl ${f.span ?? ""}`}
               >
                 <div className="absolute -inset-px rounded-2xl bg-gradient-brand opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 pointer-events-none" />
                 <h3 className="mt-5 font-bold text-[30px] text-foreground tracking-tight">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground z-1">{f.desc}</p>
+                <p className="mt-2 ml-2 text-sm leading-relaxed text-muted-foreground z-1">{f.desc}</p>
                 <img src={f.image} alt="" className={f.class} />
               </div>
             ))}
@@ -250,7 +274,7 @@ export default function Landing() {
     
       </section>
 
-      <section id="how-it-works" className="py-24 bg-secondary/30 scroll-mt-20 border-y border-border/40 relative overflow-hidden">
+      <section id="how-it-works" className="reveal-section py-24 bg-secondary/30 scroll-mt-20 border-y border-border/40 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
 
         {/* Decorative Glowing Connection/Flow Lines */}
@@ -343,7 +367,7 @@ export default function Landing() {
               Up and running in 3 steps
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="reveal-card-group grid md:grid-cols-3 gap-8">
             {[
               { 
                 step: "01", 
@@ -371,7 +395,7 @@ export default function Landing() {
               return (
                 <div
                   key={s.step}
-                  className="group relative rounded-2xl p-6 sm:p-8 flex flex-col premium-card bg-card border border-border shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-xl"
+                  className="reveal-card group relative rounded-2xl p-6 sm:p-8 flex flex-col premium-card bg-card border border-border shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-xl"
                 >
                   <div className="absolute -inset-px rounded-2xl bg-gradient-brand opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 pointer-events-none" />
                   
@@ -399,7 +423,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="py-30 relative bg-secondary/40">
+      <section className="reveal-section py-30 relative bg-secondary/40">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
@@ -430,7 +454,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="relative py-20  bg-secondary/40">
+      <section className="reveal-section relative py-20  bg-secondary/40">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
 
         <div className="relative max-w-6xl mx-auto  rounded-2xl sm:px-6 p-4">
@@ -438,13 +462,13 @@ export default function Landing() {
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Loved by shop owners</div>
             <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">What shopkeepers are saying</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="reveal-card-group grid md:grid-cols-3 gap-4">
             {[
               { name: "Rajesh Gupta", shop: "Gupta Kirana Store, Pune", quote: "Copilot told me exactly which products to restock before Diwali. Sales went up 20% that week." },
               { name: "Fatima Sheikh", shop: "Al-Noor Medical, Hyderabad", quote: "Invoicing used to take my son an hour every evening. Now it's done in minutes on his phone." },
               { name: "Suresh Iyer", shop: "Iyer General Stores, Chennai", quote: "Low-stock alerts alone have saved me from running out of essentials at least a dozen times." },
             ].map((t) => (
-              <div key={t.name} className="rounded-2xl border border-border bg-card p-6 shadow-soft">
+              <div key={t.name} className="reveal-card rounded-2xl border border-border bg-card p-6 shadow-soft">
                 <Quote className="h-5 w-5 text-brand/40" />
                 <p className="mt-3 text-sm leading-relaxed">{t.quote}</p>
                 <div className="mt-4 text-sm font-semibold">{t.name}</div>
@@ -456,14 +480,14 @@ export default function Landing() {
 
       </section>
 
-      <section id="pricing" className="py-20 scroll-mt-20 relative bg-secondary/40">
+      <section id="pricing" className="reveal-section py-20 scroll-mt-20 relative bg-secondary/40">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Simple pricing</div>
             <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">Pick a plan that fits your shop</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="reveal-card-group grid md:grid-cols-3 gap-4">
             {[
               {
                 name: "Starter",
@@ -489,7 +513,7 @@ export default function Landing() {
             ].map((p) => (
               <div
                 key={p.name}
-                className={`rounded-2xl border p-6 shadow-soft relative ${p.highlight
+                className={`reveal-card rounded-2xl border p-6 shadow-soft relative ${p.highlight
                   ? "border-brand bg-gradient-card shadow-glow relative"
                   : "border-border bg-card"
                   }`}
@@ -522,21 +546,21 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="faq" className="py-20 bg-secondary/40 scroll-mt-20 relative">
+      <section id="faq" className="reveal-section py-20 bg-secondary/40 scroll-mt-20 relative">
        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Questions</div>
             <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">Frequently asked questions</h2>
           </div>
-          <div className="space-y-3 ">
+          <div className="reveal-card-group space-y-3 ">
             {[
               { q: "Do I need any special hardware?", a: "No. ShopPilot works on any Android or iOS phone, and on desktop. No POS terminal or tablet required." },
               { q: "Can I import my existing stock list?", a: "Yes — upload an Excel sheet or type it in manually, and Copilot will help clean it up." },
               { q: "Is my data safe?", a: "All your sales and inventory data is encrypted in transit and at rest, with automatic daily backups." },
               { q: "Can I cancel anytime?", a: "Yes, there's no lock-in. You can downgrade to the free Starter plan whenever you like." },
             ].map((item) => (
-              <details key={item.q} className="group rounded-xl border border-border bg-white p-4 z-1 relative   ">
+              <details key={item.q} className="reveal-card group rounded-xl border border-border bg-white p-4 z-1 relative   ">
                 <summary className="flex items-center justify-between cursor-pointer list-none  font-medium text-sm">
                   {item.q}
                   <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform  group-open:rotate-180" />
@@ -548,7 +572,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="py-20 relative">
+      <section className="reveal-section py-20 relative">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="relative overflow-hidden rounded-[2rem] bg-gradient-brand px-8 sm:px-12 py-14 sm:py-16 flex flex-col sm:flex-row items-center justify-between gap-10">
@@ -595,7 +619,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="relative border-t border-border bg-card/40 pt-16 pb-8 overflow-hidden">
+      <footer className="reveal-section relative border-t border-border bg-card/40 pt-16 pb-8 overflow-hidden">
         <div className="absolute left-1/4 bottom-0 -z-10 h-80 w-80 rounded-full bg-brand/5 blur-3xl" />
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="absolute right-1/4 top-0 -z-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
