@@ -3,16 +3,9 @@ import {
   Store,
   Sparkles,
   Package,
-  Receipt,
-  MessageCircle,
-  BarChart3,
   ArrowRight,
   Check,
-  Bell,
   User as UserIcon,
-  Smartphone,
-  ShieldCheck,
-  Zap,
   Quote,
   ChevronDown,
   Github,
@@ -20,6 +13,9 @@ import {
   Linkedin,
   Send,
   Heart,
+  Database,
+  Server,
+  Cpu,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -56,7 +52,6 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Nav */}
       <header className="sticky top-0 z-30 bg-background border border-b">
         <div className="max-w-5xl   mx-auto px-4 sm:px-6 h-16 flex items-center justify-between  ">
           <Link to="/" className="flex items-center gap-2.5">
@@ -68,7 +63,6 @@ export default function Landing() {
             </div>
           </Link>
 
-          {/* Desktop nav links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a href="#features" onClick={scrollToSection("features")} className="hover:text-foreground transition-colors">Features</a>
             <a href="#how-it-works" onClick={scrollToSection("how-it-works")} className="hover:text-foreground transition-colors">How it works</a>
@@ -99,7 +93,6 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="relative bg-gradient-hero overflow-hidden pt-12 pb-24">
         <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="hero-mesh-glow" />
@@ -162,7 +155,6 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Demo App Preview */}
         <section id="demo" className="relative z-10 px-4 sm:px-6 pb-4">
           <div className="relative mx-auto max-w-5xl">
             <div className="group relative rounded-2xl border border-border bg-card/50 p-2 backdrop-blur-sm shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/30">
@@ -192,9 +184,9 @@ export default function Landing() {
         </section>
       </section>
 
-      {/* Stats bar */}
-      <section className="relative z-20 -mt-16 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="rounded-[14px] border border-border/80 bg-card/80 backdrop-blur-lg shadow-xl p-6 sm:p-10">
+      {/* <section className="relative z-20    sm:px-6  mx-auto flex items-center justify-center bg-secondary">
+          <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
+        <div className="rounded-[20px] border border-border/80 bg-card/80 max-w-5xl backdrop-blur-lg shadow-xl p-6 sm:p-10 mt-2 relative">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 divide-y lg:divide-y-0 lg:divide-x divide-border/60">
             {[
               { value: "2,400+", label: "Shops onboarded" },
@@ -218,10 +210,10 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Feature grid */}
-      <section id="features" className="py-24 scroll-mt-20 relative bg-background">
+      <section id="features" className="py-24 scroll-mt-20 relative bg-secondary ">
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/5 border border-brand/20 px-3.5 py-1.5 text-xs font-semibold text-brand tracking-wider uppercase">
@@ -255,27 +247,93 @@ export default function Landing() {
             ))}
           </div>
         </div>
-        <div className="absolute  -top-25 h-2 w-full bg-[#76d9b5] " />
-        {/* <div className="md:absolute  md:ml-10 md:-top-25 w-2 h-140 bg-[#76d9b5] " />
-        <div className="md:absolute  md:ml-20 md:-top-25 w-2 h-120 bg-[#76d9b5] " />
-        <div className="md:absolute md:ml-30 md:-top-25 w-2 h-100 bg-[#76d9b5] " />
-        <div className="md:absolute  md:ml-40 md:-top-25 w-2 h-80 bg-[#76d9b5] " />
-        <div className="md:absolute  md:ml-50 md:-top-25 w-2 h-60 bg-[#76d9b5] " />
-        <div className="md:absolute  md:ml-60 md:-top-25 w-2 h-40 bg-[#76d9b5] " />
-        <div className="md:absolute  md:ml-70 md:-top-25 w-2 h-30 bg-[#76d9b5] " />
-
-        <div className="md:absolute right-0  md:mr-10 md:-top-25 w-2 h-140 bg-[#76d9b5] " />
-        <div className="md:absolute right-0  md:mr-20 md:-top-25 w-2 h-120 bg-[#76d9b5] " />
-        <div className="md:absolute right-0  md:mr-30 md:-top-25 w-2 h-100 bg-[#76d9b5] " />
-        <div className="md:absolute right-0  md:mr-40 md:-top-25 w-2 h-80 bg-[#76d9b5] " />
-        <div className="md:absolute right-0  md:mr-50 md:-top-25 w-2 h-60 bg-[#76d9b5] " />
-        <div className="md:absolute right-0  md:mr-60 md:-top-25 w-2 h-40 bg-[#76d9b5] " />
-        <div className="md:absolute right-0  md:mr-70 md:-top-25 w-2 h-30 bg-[#76d9b5] " /> */}
-
+    
       </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className="py-24 bg-secondary/30 scroll-mt-20 border-y border-border/40">
+      <section id="how-it-works" className="py-24 bg-secondary/30 scroll-mt-20 border-y border-border/40 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
+
+        {/* Decorative Glowing Connection/Flow Lines */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30 dark:opacity-40">
+          <svg className="w-full h-full min-w-[1400px] absolute left-1/2 -translate-x-1/2 top-0" fill="none" viewBox="0 0 1440 600">
+            <path
+              d="M -100 150 C 300 80, 500 480, 900 420 C 1100 400, 1300 160, 1600 120"
+              stroke="url(#gradient-line-1)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              className="animate-flow-slow"
+            />
+            <path
+              d="M -50 480 C 400 520, 700 120, 1000 180 C 1200 200, 1350 450, 1550 480"
+              stroke="url(#gradient-line-2)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              className="animate-flow-fast"
+            />
+            <path
+              d="M 150 -50 C 350 220, 550 280, 750 320 C 950 360, 1150 250, 1350 650"
+              stroke="url(#gradient-line-3)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              className="animate-flow-slow"
+            />
+            <defs>
+              <linearGradient id="gradient-line-1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.1" />
+                <stop offset="30%" stopColor="#00a263" stopOpacity="0.75" />
+                <stop offset="70%" stopColor="#00bd78" stopOpacity="0.75" />
+                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.1" />
+              </linearGradient>
+              <linearGradient id="gradient-line-2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#00a263" stopOpacity="0" />
+                <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#00a263" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="gradient-line-3" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.15" />
+                <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#00bd78" stopOpacity="0.1" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        {/* Left Floating Backend Card */}
+        <div className="absolute top-[20%] left-4 xl:left-12 hidden lg:flex items-center gap-3 p-3.5 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl pointer-events-none select-none animate-float-slow z-10">
+          <div className="h-10 w-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 grid place-items-center text-blue-500 shadow-inner">
+            <Database className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-xs font-bold text-foreground">Secure Database</div>
+            <div className="text-[10px] font-semibold text-muted-foreground">PostgreSQL • Auto Backups</div>
+          </div>
+          <div className="absolute -inset-0.5 rounded-2xl bg-blue-500/10 opacity-10 blur-sm -z-10" />
+        </div>
+
+        {/* Right Floating Backend Card */}
+        <div className="absolute bottom-[20%] right-4 xl:right-12 hidden lg:flex items-center gap-3 p-3.5 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl pointer-events-none select-none animate-float-delayed z-10">
+          <div className="h-10 w-10 rounded-xl bg-brand/10 dark:bg-brand/20 grid place-items-center text-brand shadow-inner">
+            <Server className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-xs font-bold text-foreground">Cloud Server</div>
+            <div className="text-[10px] font-semibold text-muted-foreground">API Sync • 99.9% Uptime</div>
+          </div>
+          <div className="absolute -inset-0.5 rounded-2xl bg-brand/10 opacity-10 blur-sm -z-10" />
+        </div>
+
+        {/* Floating CPU/AI Badge for Extra Visual Appeal */}
+        <div className="absolute top-[10%] right-8 xl:right-24 hidden xl:flex items-center gap-3 p-3.5 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl pointer-events-none select-none animate-float-slow z-10">
+          <div className="h-10 w-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 grid place-items-center text-amber-500 shadow-inner">
+            <Cpu className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-xs font-bold text-foreground">AI Processing</div>
+            <div className="text-[10px] font-semibold text-muted-foreground">Real-time Inference</div>
+          </div>
+          <div className="absolute -inset-0.5 rounded-2xl bg-amber-500/10 opacity-10 blur-sm -z-10" />
+        </div>
+
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/5 border border-brand/20 px-3.5 py-1.5 text-xs font-semibold text-brand tracking-wider uppercase">
@@ -317,7 +375,6 @@ export default function Landing() {
                 >
                   <div className="absolute -inset-px rounded-2xl bg-gradient-brand opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 pointer-events-none" />
                   
-                  {/* Step Header with Number & Icon */}
                   <div className="flex items-center justify-between">
                     <span className="text-4xl font-extrabold text-muted-foreground/20 group-hover:text-brand/30 transition-colors duration-300 font-mono select-none">
                       {s.step}
@@ -330,7 +387,6 @@ export default function Landing() {
                   <h3 className="mt-6 font-bold text-lg text-foreground tracking-tight">{s.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
 
-                  {/* Desktop connector arrow */}
                   {index < 2 && (
                     <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background shadow-soft text-muted-foreground transition-transform duration-300 group-hover:translate-x-3/4">
                       <ArrowRight className="h-4 w-4" />
@@ -343,8 +399,9 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Killer feature */}
-      <section className="py-20">
+      <section className="py-30 relative bg-secondary/40">
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
+
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Business Copilot</div>
@@ -358,7 +415,7 @@ export default function Landing() {
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-border bg-card shadow-glow p-5 space-y-3">
+          <div className="rounded-2xl border border-border  relative bg-white  shadow-glow p-5 space-y-3">
             <div className="text-xs text-muted-foreground">You asked</div>
             <div className="text-sm font-medium">"Why did soft drink sales drop this week?"</div>
             <div className="rounded-xl bg-gradient-card border border-border p-4 space-y-2">
@@ -373,9 +430,10 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="relative py-20 bg-secondary/40">
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+      <section className="relative py-20  bg-secondary/40">
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
+
+        <div className="relative max-w-6xl mx-auto  rounded-2xl sm:px-6 p-4">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Loved by shop owners</div>
             <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">What shopkeepers are saying</h2>
@@ -398,8 +456,8 @@ export default function Landing() {
 
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20 scroll-mt-20">
+      <section id="pricing" className="py-20 scroll-mt-20 relative bg-secondary/40">
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Simple pricing</div>
@@ -431,7 +489,7 @@ export default function Landing() {
             ].map((p) => (
               <div
                 key={p.name}
-                className={`rounded-2xl border p-6 shadow-soft ${p.highlight
+                className={`rounded-2xl border p-6 shadow-soft relative ${p.highlight
                   ? "border-brand bg-gradient-card shadow-glow relative"
                   : "border-border bg-card"
                   }`}
@@ -464,33 +522,34 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="py-20 bg-secondary/40 scroll-mt-20">
+      <section id="faq" className="py-20 bg-secondary/40 scroll-mt-20 relative">
+       <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Questions</div>
             <h2 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">Frequently asked questions</h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 ">
             {[
               { q: "Do I need any special hardware?", a: "No. ShopPilot works on any Android or iOS phone, and on desktop. No POS terminal or tablet required." },
               { q: "Can I import my existing stock list?", a: "Yes — upload an Excel sheet or type it in manually, and Copilot will help clean it up." },
               { q: "Is my data safe?", a: "All your sales and inventory data is encrypted in transit and at rest, with automatic daily backups." },
               { q: "Can I cancel anytime?", a: "Yes, there's no lock-in. You can downgrade to the free Starter plan whenever you like." },
             ].map((item) => (
-              <details key={item.q} className="group rounded-xl border border-border bg-card p-4 shadow-soft">
-                <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-sm">
+              <details key={item.q} className="group rounded-xl border border-border bg-white p-4 z-1 relative   ">
+                <summary className="flex items-center justify-between cursor-pointer list-none  font-medium text-sm">
                   {item.q}
-                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform  group-open:rotate-180" />
                 </summary>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.a}</p>
-              </details>
+              </details> 
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-20">
+      <section className="py-20 relative">
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="relative overflow-hidden rounded-[2rem] bg-gradient-brand px-8 sm:px-12 py-14 sm:py-16 flex flex-col sm:flex-row items-center justify-between gap-10">
             <div className="relative z-10 max-w-md text-center sm:text-left">
@@ -537,14 +596,13 @@ export default function Landing() {
       </section>
 
       <footer className="relative border-t border-border bg-card/40 pt-16 pb-8 overflow-hidden">
-        {/* Ambient Glows */}
         <div className="absolute left-1/4 bottom-0 -z-10 h-80 w-80 rounded-full bg-brand/5 blur-3xl" />
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="absolute right-1/4 top-0 -z-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 pb-12">
             
-            {/* Column 1: Brand details */}
             <div className="lg:col-span-2 space-y-4">
               <div className="flex items-center gap-2.5">
                 <div className="h-8 w-8 rounded-lg bg-gradient-brand grid place-items-center text-brand-foreground shadow-glow">
@@ -558,7 +616,6 @@ export default function Landing() {
                 Empowering Indian retail merchants and kirana shops with smart invoicing, real-time inventory tracking, and custom daily AI insights.
               </p>
               
-              {/* Social links */}
               <div className="flex items-center gap-3 pt-2">
                 {[
                   { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
@@ -582,7 +639,6 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Column 2: Product */}
             <div className="space-y-3.5">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/80">Product</h4>
               <ul className="space-y-2 text-sm">
@@ -604,7 +660,6 @@ export default function Landing() {
               </ul>
             </div>
 
-            {/* Column 3: Resources */}
             <div className="space-y-3.5">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/80">Resources</h4>
               <ul className="space-y-2 text-sm">
@@ -627,7 +682,6 @@ export default function Landing() {
               </ul>
             </div>
 
-            {/* Column 4: Newsletter subscription */}
             <div className="space-y-3.5">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/80">Stay Updated</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -665,10 +719,7 @@ export default function Landing() {
                 </div>
               </form>
             </div>
-
           </div>
-
-          {/* Bottom row */}
           <div className="border-t border-border/60 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <div>
               © {new Date().getFullYear()} ShopPilot AI. All rights reserved.
@@ -687,8 +738,7 @@ export default function Landing() {
             </button>
           </div>
         </div>
-
-        <div className="text-center mt-12 select-none pointer-events-none ">
+        <div className="text-center mt-12 select-none pointer-events-none z-2 relative ">
           <h1 className="font-extrabold text-[100px] sm:text-[200px] leading-none bg-gradient-to-t from-white via-[#00bd78] to-[#00bd78] bg-clip-text text-transparent">
             ShopPilot AI
           </h1>

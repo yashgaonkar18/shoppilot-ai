@@ -109,7 +109,7 @@
   --sidebar-accent: oklch(0.95 0.04 160);
   --sidebar-accent-foreground: oklch(0.35 0.12 160);
   --sidebar-border: oklch(0.92 0.008 250);
-  --sidebar-ring: oklch(0.62 0.16 160);
+  --sidebar-ring: #00a263;
 
   --gradient-brand: linear-gradient(135deg, #00a263, hsl(185, 100%, 30%));
   --gradient-hero: radial-gradient(
@@ -164,7 +164,7 @@
 
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.7 0.17 160);
+  --ring: #00bd78;
 
   --chart-1: oklch(0.7 0.17 160);
   --chart-2: oklch(0.65 0.18 240);
@@ -294,4 +294,22 @@
   pointer-events: none;
   z-index: 1;
 }
+
+@keyframes flow {
+  from {
+    stroke-dashoffset: 160;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-flow-slow {
+  animation: flow 20s linear infinite;
+}
+
+.animate-flow-fast {
+  animation: flow 10s linear infinite;
+}
+
 
