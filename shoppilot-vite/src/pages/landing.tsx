@@ -42,10 +42,9 @@ export default function Landing() {
     });
   }, []);
 
-  // Scroll-triggered fade/slide-up reveal for every section
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const sections = gsap.utils.toArray(".reveal-section");
+      const sections = gsap.utils.toArray<HTMLElement>(".reveal-section");
 
       sections.forEach((section) => {
         gsap.fromTo(
@@ -61,16 +60,14 @@ export default function Landing() {
               start: "top 85%",
               end: "bottom 20%",
               toggleActions: "play none none reverse",
-              // markers: true, // uncomment for debugging
             },
           }
         );
       });
 
-      // Stagger the feature/step/testimonial/pricing cards inside their sections
-      const cardGroups = gsap.utils.toArray(".reveal-card-group");
+      const cardGroups = gsap.utils.toArray<HTMLElement>(".reveal-card-group");
       cardGroups.forEach((group) => {
-        const cards = group.querySelectorAll(".reveal-card");
+        const cards = group.querySelectorAll<HTMLElement>(".reveal-card");
         if (!cards.length) return;
         gsap.fromTo(
           cards,
@@ -271,7 +268,7 @@ export default function Landing() {
             ))}
           </div>
         </div>
-    
+
       </section>
 
       <section id="how-it-works" className="reveal-section py-24 bg-secondary/30 scroll-mt-20 border-y border-border/40 relative overflow-hidden">
@@ -322,7 +319,6 @@ export default function Landing() {
           </svg>
         </div>
 
-        {/* Left Floating Backend Card */}
         <div className="absolute top-[20%] left-4 xl:left-12 hidden lg:flex items-center gap-3 p-3.5 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl pointer-events-none select-none animate-float-slow z-10">
           <div className="h-10 w-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 grid place-items-center text-blue-500 shadow-inner">
             <Database className="h-5 w-5" />
@@ -334,7 +330,6 @@ export default function Landing() {
           <div className="absolute -inset-0.5 rounded-2xl bg-blue-500/10 opacity-10 blur-sm -z-10" />
         </div>
 
-        {/* Right Floating Backend Card */}
         <div className="absolute bottom-[20%] right-4 xl:right-12 hidden lg:flex items-center gap-3 p-3.5 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl pointer-events-none select-none animate-float-delayed z-10">
           <div className="h-10 w-10 rounded-xl bg-brand/10 dark:bg-brand/20 grid place-items-center text-brand shadow-inner">
             <Server className="h-5 w-5" />
@@ -346,7 +341,6 @@ export default function Landing() {
           <div className="absolute -inset-0.5 rounded-2xl bg-brand/10 opacity-10 blur-sm -z-10" />
         </div>
 
-        {/* Floating CPU/AI Badge for Extra Visual Appeal */}
         <div className="absolute top-[10%] right-8 xl:right-24 hidden xl:flex items-center gap-3 p-3.5 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl pointer-events-none select-none animate-float-slow z-10">
           <div className="h-10 w-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 grid place-items-center text-amber-500 shadow-inner">
             <Cpu className="h-5 w-5" />
@@ -369,23 +363,23 @@ export default function Landing() {
           </div>
           <div className="reveal-card-group grid md:grid-cols-3 gap-8">
             {[
-              { 
-                step: "01", 
-                title: "Create your shop", 
+              {
+                step: "01",
+                title: "Create your shop",
                 desc: "Sign up with your phone number and shop name — no paperwork needed.",
                 icon: Store,
                 color: "text-blue-500 bg-blue-500/10 dark:bg-blue-500/20"
               },
-              { 
-                step: "02", 
-                title: "Add your products", 
+              {
+                step: "02",
+                title: "Add your products",
                 desc: "Type them in, import from Excel, or snap a photo of your stock register.",
                 icon: Package,
                 color: "text-amber-500 bg-amber-500/10 dark:bg-amber-500/20"
               },
-              { 
-                step: "03", 
-                title: "Let Copilot take over", 
+              {
+                step: "03",
+                title: "Let Copilot take over",
                 desc: "Get daily insights, alerts, and answers to your business questions automatically.",
                 icon: Sparkles,
                 color: "text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20"
@@ -398,7 +392,7 @@ export default function Landing() {
                   className="reveal-card group relative rounded-2xl p-6 sm:p-8 flex flex-col premium-card bg-card border border-border shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-xl"
                 >
                   <div className="absolute -inset-px rounded-2xl bg-gradient-brand opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 pointer-events-none" />
-                  
+
                   <div className="flex items-center justify-between">
                     <span className="text-4xl font-extrabold text-muted-foreground/20 group-hover:text-brand/30 transition-colors duration-300 font-mono select-none">
                       {s.step}
@@ -547,7 +541,7 @@ export default function Landing() {
       </section>
 
       <section id="faq" className="reveal-section py-20 bg-secondary/40 scroll-mt-20 relative">
-       <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 z-0 pointer-events-none" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand">Questions</div>
@@ -566,7 +560,7 @@ export default function Landing() {
                   <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform  group-open:rotate-180" />
                 </summary>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.a}</p>
-              </details> 
+              </details>
             ))}
           </div>
         </div>
@@ -626,7 +620,7 @@ export default function Landing() {
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 pb-12">
-            
+
             <div className="lg:col-span-2 space-y-4">
               <div className="flex items-center gap-2.5">
                 <div className="h-8 w-8 rounded-lg bg-gradient-brand grid place-items-center text-brand-foreground shadow-glow">
@@ -639,7 +633,7 @@ export default function Landing() {
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
                 Empowering Indian retail merchants and kirana shops with smart invoicing, real-time inventory tracking, and custom daily AI insights.
               </p>
-              
+
               <div className="flex items-center gap-3 pt-2">
                 {[
                   { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
@@ -711,7 +705,7 @@ export default function Landing() {
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Subscribe to get daily tips on growing your retail shop.
               </p>
-              <form 
+              <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   const target = e.currentTarget;
