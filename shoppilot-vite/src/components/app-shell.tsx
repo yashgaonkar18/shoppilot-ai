@@ -86,9 +86,44 @@ export function AppShell({ children, title, subtitle, action }: {
           <NotificationBell />
           {action}
         </header>
-        <main className="flex-1 p-4 lg:p-8">{children}</main>
+        <main className={cn("flex-1 p-4 lg:p-8", location.pathname === "/dashboard" && "pb-24 lg:pb-8")}>{children}</main>
+        {location.pathname === "/dashboard" && <DashboardMobileNav />}
       </div>
     </div>
+  );
+}
+
+function DashboardMobileNav() {
+  const location = useLocation();
+  const items = [
+    { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+    { to: "/inventory", label: "Stock", icon: Package },
+    { to: "/sales", label: "Sales", icon: Receipt },
+  ];
+
+  return (
+    <nav
+      aria-label="Dashboard shortcuts"
+      className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-border bg-background/95 px-3 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur lg:hidden"
+    >
+      {items.map(({ to, label, icon: Icon }) => {
+        const active = location.pathname === to;
+        return (
+          <Link
+            key={to}
+            to={to}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-medium",
+              active ? "text-brand" : "text-muted-foreground"
+            )}
+          >
+            <Icon className="h-5 w-5" aria-hidden="true" />
+            {label}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 
