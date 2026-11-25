@@ -1,517 +1,382 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Package,
-  Receipt,
-  TrendingUp,
   AlertTriangle,
-  Sparkles,
-  ArrowUpRight,
+  ArrowRight,
+  BarChart3,
+  Package,
   Plus,
-  Bell,
-  Bot,
-  Brain,
-  TrendingDown,
-  PackageSearch,
+  Receipt,
+  ShoppingBag,
+  TrendingUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppShell } from "@/components/app-shell";
-import { useEffect, useMemo, useState } from "react";
-
 import { getProducts } from "@/api/product";
 import { getSales } from "@/api/sales";
-import { getBusinessInsights } from "@/api/ai";
-
 import type { Product } from "@/types/product";
 import type { Sale } from "@/types/sales";
 import { fmtINR, timeAgo } from "@/lib/format";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface Insights {
-  summary: string;
-  fast_movers: string[];
-  slow_movers: string[];
-  restock_now: string[];
-  profit_tips: string[];
-  business_health?: string;
-}
-
-// ─── Loading Skeleton ─────────────────────────────────────────────────────────
+type TrendDay = {
+  key: string;
+  label: string;
+  total: number;
+};
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-2xl border border-border bg-card p-5">
-            <div className="h-10 w-10 rounded-lg bg-muted mb-4" />
-            <div className="h-7 w-20 rounded bg-muted mb-2" />
-            <div className="h-4 w-32 rounded bg-muted" />
-          </div>
+    <div className="space-y-5 animate-pulse" aria-label="Loading dashboard">
+      <div className="grid grid-cols-2 gap-3">
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="h-28 rounded-2xl bg-card border border-border" />
         ))}
       </div>
-
-      <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 space-y-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-8 w-8 rounded-lg bg-muted" />
-            <div>
-              <div className="h-4 w-36 rounded bg-muted mb-1" />
-              <div className="h-3 w-24 rounded bg-muted" />
-            </div>
-          </div>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-4 rounded bg-muted" style={{ width: `${90 - i * 8}%` }} />
-          ))}
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
-          <div className="h-5 w-24 rounded bg-muted mb-2" />
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex justify-between items-center">
-              <div>
-                <div className="h-4 w-28 rounded bg-muted mb-1" />
-                <div className="h-3 w-20 rounded bg-muted" />
-              </div>
-              <div className="h-5 w-12 rounded bg-muted" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="h-5 w-5 rounded bg-muted" />
-          <div className="h-4 w-32 rounded bg-muted" />
-        </div>
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex gap-3 items-start">
-            <div className="h-2.5 w-2.5 rounded-full bg-muted mt-1.5 shrink-0" />
-            <div className="flex-1 space-y-1.5">
-              <div className="h-4 w-40 rounded bg-muted" />
-              <div className="h-3 w-full rounded bg-muted" />
-              <div className="h-3 w-24 rounded bg-muted" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
-        <div className="h-5 w-32 rounded bg-muted mb-2" />
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex justify-between">
-            <div>
-              <div className="h-4 w-40 rounded bg-muted mb-2" />
-              <div className="h-3 w-28 rounded bg-muted" />
-            </div>
-            <div>
-              <div className="h-4 w-20 rounded bg-muted mb-2" />
-              <div className="h-3 w-16 rounded bg-muted" />
-            </div>
-          </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {[1, 2].map((item) => (
+          <div key={item} className="h-64 rounded-2xl bg-card border border-border" />
         ))}
       </div>
     </div>
   );
 }
 
-// ─── KPI Card ─────────────────────────────────────────────────────────────────
-
-function KpiCard({
-  label,
-  value,
-  icon: Icon,
-  accent,
-}: {
-  label: string;
-  value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
-  accent: "brand" | "success" | "warning" | "chart";
-}) {
-  const tones: Record<string, string> = {
-    brand: "bg-gradient-brand text-brand-foreground",
-    success: "bg-success/10 text-success",
-    warning: "bg-warning/15 text-warning-foreground",
-    chart: "bg-accent text-accent-foreground",
-  };
-  return (
-    <div className="rounded-2xl border border-border bg-card p-4 lg:p-5 shadow-soft hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
-      <div className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ${tones[accent]}`}>
-        <Icon className="h-4 w-4" />
-      </div>
-      <div className="mt-3 text-2xl font-semibold tracking-tight">{value}</div>
-      <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
-    </div>
-  );
-}
-
-// ─── Insight List ─────────────────────────────────────────────────────────────
-
-function InsightList({
+function DashboardCard({
   title,
-  items,
-  tone,
   icon: Icon,
+  children,
+  className = "",
 }: {
   title: string;
-  items: string[];
-  tone: "success" | "warning" | "destructive";
-  icon?: React.ComponentType<{ className?: string }>;
+  icon: typeof Package;
+  children: React.ReactNode;
+  className?: string;
 }) {
-  if (!items || items.length === 0) return null;
-  const tones: Record<string, string> = {
-    success: "text-success",
-    warning: "text-warning-foreground",
-    destructive: "text-destructive",
-  };
-  const bgTones: Record<string, string> = {
-    success: "bg-success/8",
-    warning: "bg-warning/8",
-    destructive: "bg-destructive/8",
-  };
   return (
-    <div className={`rounded-xl ${bgTones[tone]} border border-border p-3`}>
-      <div className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2 ${tones[tone]}`}>
-        {Icon && <Icon className="h-3.5 w-3.5" />}
-        {title}
+    <section className={`rounded-2xl border border-border bg-card shadow-soft ${className}`}>
+      <div className="flex items-center gap-2.5 border-b border-border px-4 py-4 sm:px-5">
+        <Icon className="h-4 w-4 text-brand" aria-hidden="true" />
+        <h2 className="text-sm font-semibold">{title}</h2>
       </div>
-      <ul className="space-y-1.5 text-sm">
-        {items.map((t, i) => (
-          <li key={i} className="flex gap-2 items-start">
-            <span className={`${tones[tone]} mt-0.5`}>•</span>
-            <span>{t}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+      {children}
+    </section>
   );
 }
 
-// ─── Sale Card ────────────────────────────────────────────────────────────────
+function getLocalDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
-function SaleCard({ sale }: { sale: Sale }) {
-  const summary = sale.sale_items
+function SaleRow({ sale }: { sale: Sale }) {
+  const itemSummary = sale.sale_items
     .slice(0, 2)
-    .map((i: any) => `${i.product_name} ×${i.qty}`)
+    .map((item) => `${item.product_name} ×${item.qty}`)
     .join(", ");
-  const extra = sale.sale_items.length > 2 ? ` +${sale.sale_items.length - 2}` : "";
+  const extraItems = sale.sale_items.length > 2 ? ` +${sale.sale_items.length - 2}` : "";
 
   return (
-    <div className="p-4 flex items-center justify-between gap-4 hover:bg-accent/30 transition-colors duration-150 rounded-xl">
+    <li className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
       <div className="min-w-0">
-        <div className="text-sm font-medium truncate">{sale.customer_name || "Walk-in customer"}</div>
-        <div className="text-xs text-muted-foreground truncate">
-          {summary}
-          {extra}
-        </div>
+        <p className="truncate text-sm font-medium">{sale.customer_name || "Walk-in customer"}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {itemSummary}{extraItems}
+        </p>
       </div>
-      <div className="text-right shrink-0">
-        <div className="text-sm font-semibold text-success">{fmtINR(sale.total)}</div>
-        <div className="text-xs text-muted-foreground">{timeAgo(sale.sold_at)}</div>
+      <div className="shrink-0 text-right">
+        <p className="text-sm font-semibold">{fmtINR(sale.total)}</p>
+        <p className="text-xs text-muted-foreground">{timeAgo(sale.sold_at)}</p>
       </div>
-    </div>
+    </li>
   );
 }
-
-// ─── Main Dashboard ───────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
-  const [insights, setInsights] = useState<Insights | null>(null);
-  const [insightsLoading, setInsightsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    loadDashboard();
-    const interval = setInterval(loadDashboard, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true);
+    setError(false);
     try {
-      setLoading(true);
-
-      // Load core data first — never blocked by AI
-      const [productsRes, salesRes] = await Promise.all([
-        getProducts(),
-        getSales(),
-      ]);
-
+      const [productsRes, salesRes] = await Promise.all([getProducts(), getSales()]);
       setProducts(productsRes.data.products);
       setSales(salesRes.data.sales);
-
-      // Load AI insights separately so a failure doesn't break dashboard
-      loadInsights();
-    } catch (err) {
-      console.error(err);
+    } catch (loadError) {
+      console.error("Unable to load dashboard data", loadError);
+      setError(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadInsights = async () => {
-    try {
-      setInsightsLoading(true);
-      const res = await getBusinessInsights();
-      if (res.data?.success !== false) {
-        setInsights(res.data);
-      }
-    } catch (err) {
-      // Silently fall back to local insights on error (rate limit, etc.)
-      console.warn("AI insights unavailable, using local fallback");
-    } finally {
-      setInsightsLoading(false);
-    }
-  };
+  useEffect(() => {
+    void loadDashboard(true);
+    const interval = window.setInterval(() => void loadDashboard(), 30000);
+    return () => window.clearInterval(interval);
+  }, [loadDashboard]);
 
   const stats = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const tomorrowStart = new Date(todayStart);
+    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+    const todaySales = sales.filter((sale) => {
+      const soldAt = new Date(sale.sold_at);
+      return soldAt >= todayStart && soldAt < tomorrowStart;
+    });
 
-    const month = new Date();
-    month.setDate(1);
-    month.setHours(0, 0, 0, 0);
+    const trendStart = new Date(todayStart);
+    trendStart.setDate(trendStart.getDate() - 6);
+    const trendMap = new Map<string, TrendDay>();
+    for (let offset = 0; offset < 7; offset += 1) {
+      const day = new Date(trendStart);
+      day.setDate(trendStart.getDate() + offset);
+      trendMap.set(getLocalDateKey(day), {
+        key: getLocalDateKey(day),
+        label: day.toLocaleDateString("en-IN", { weekday: "short" }),
+        total: 0,
+      });
+    }
+    sales.forEach((sale) => {
+      const day = trendMap.get(getLocalDateKey(new Date(sale.sold_at)));
+      if (day) day.total += sale.total;
+    });
 
-    const todayTotal = sales
-      .filter((s) => new Date(s.sold_at) >= today)
-      .reduce((sum, s) => sum + s.total, 0);
-
-    const monthTotal = sales
-      .filter((s) => new Date(s.sold_at) >= month)
-      .reduce((sum, s) => sum + s.total, 0);
-
-    const lowStock = products.filter((p) => p.qty <= p.low_stock_threshold);
+    const productSales = new Map<string, { qty: number; revenue: number }>();
+    sales.forEach((sale) => {
+      sale.sale_items.forEach((item) => {
+        const current = productSales.get(item.product_name) ?? { qty: 0, revenue: 0 };
+        current.qty += item.qty;
+        current.revenue += item.line_total;
+        productSales.set(item.product_name, current);
+      });
+    });
 
     return {
-      productCount: products.length,
-      todayTotal,
-      monthTotal,
-      lowStock,
-      recentSales: sales.slice(0, 8),
+      todayTotal: todaySales.reduce((total, sale) => total + sale.total, 0),
+      todayCount: todaySales.length,
+      lowStock: products
+        .filter((product) => product.qty <= product.low_stock_threshold)
+        .sort((a, b) => a.qty - b.qty),
+      topProducts: Array.from(productSales.entries())
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => b.qty - a.qty)
+        .slice(0, 4),
+      trend: Array.from(trendMap.values()),
+      recentSales: [...sales]
+        .sort((a, b) => new Date(b.sold_at).getTime() - new Date(a.sold_at).getTime())
+        .slice(0, 5),
     };
   }, [products, sales]);
 
-  // Local computed insights — fallback when AI is unavailable
-  const localInsights = useMemo((): Insights => {
-    const counts = new Map<string, number>();
-    sales.forEach((sale) =>
-      sale.sale_items.forEach((item) => {
-        counts.set(item.product_name, (counts.get(item.product_name) ?? 0) + item.qty);
-      })
-    );
-    const sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
-    const fast = sorted.slice(0, 3).map(([name, qty]) => `${name} — ${qty} sold`);
-    const sellingNames = new Set(sorted.map(([n]) => n));
-    const slow = products
-      .filter((p) => !sellingNames.has(p.name))
-      .slice(0, 3)
-      .map((p) => p.name);
-    const restock = stats.lowStock.slice(0, 3).map((p) => `${p.name} (${p.qty} left)`);
-
-    return {
-      summary: `Your shop earned ${fmtINR(stats.monthTotal)} this month across ${sales.length} sales. ${stats.lowStock.length} items are running low.`,
-      fast_movers: fast,
-      slow_movers: slow,
-      restock_now: restock,
-      profit_tips: [
-        "Bundle slow movers with fast sellers.",
-        "Reorder staples before stock runs out.",
-      ],
-    };
-  }, [products, sales, stats]);
-
-  const activeInsights = insights ?? localInsights;
+  const maxTrendTotal = Math.max(...stats.trend.map((day) => day.total), 0);
+  const hasTrendSales = stats.trend.some((day) => day.total > 0);
 
   return (
     <AppShell
-      title="Good day, business is moving"
+      title="Your shop today"
       subtitle={new Date().toLocaleDateString("en-IN", {
         weekday: "long",
         day: "numeric",
         month: "long",
       })}
-      action={
-        <Link
-          to="/sales"
-          className="hidden sm:inline-flex h-9 items-center gap-1.5 px-3 rounded-lg bg-gradient-brand text-brand-foreground text-sm font-medium shadow-glow hover:opacity-95 transition-opacity"
-        >
-          <Plus className="h-4 w-4" /> New sale
-        </Link>
-      }
     >
       {loading ? (
         <DashboardSkeleton />
+      ) : error && products.length === 0 && sales.length === 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-6 text-center sm:p-10">
+          <AlertTriangle className="mx-auto h-9 w-9 text-warning-foreground" aria-hidden="true" />
+          <h2 className="mt-3 text-lg font-semibold">Dashboard data couldn’t load</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Check your connection and try again.</p>
+          <button
+            type="button"
+            onClick={() => void loadDashboard(true)}
+            className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground"
+          >
+            Try again
+          </button>
+        </div>
       ) : (
-        <div className="space-y-6">
-
-          {/* ── KPI Cards ── */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-            <KpiCard label="Total products" value={stats.productCount} icon={Package} accent="brand" />
-            <KpiCard label="Today's sales" value={fmtINR(stats.todayTotal)} icon={Receipt} accent="success" />
-            <KpiCard label="Monthly revenue" value={fmtINR(stats.monthTotal)} icon={TrendingUp} accent="chart" />
-            <KpiCard label="Low stock alerts" value={stats.lowStock.length} icon={AlertTriangle} accent="warning" />
-          </div>
-
-          {/* ── AI Insights + Low Stock ── */}
-          <div className="grid lg:grid-cols-3 gap-4">
-
-            {/* AI Insights */}
-            <div className="lg:col-span-2 rounded-2xl border border-border bg-gradient-card shadow-soft overflow-hidden">
-              <div className="flex items-center justify-between p-5 border-b border-border">
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-gradient-brand grid place-items-center text-brand-foreground">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">AI Business Insights</div>
-                    <div className="text-xs text-muted-foreground">
-                      {insightsLoading ? "Analyzing your business..." : insights ? "Powered by Gemini" : "Local analysis"}
-                    </div>
-                  </div>
-                </div>
-                <Brain className={`h-4 w-4 ${insightsLoading ? "text-brand animate-pulse" : "text-muted-foreground"}`} />
-              </div>
-
-              <div className="p-5 space-y-4">
-                {sales.length === 0 ? (
-                  <div className="py-12 text-center">
-                    <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold">No business data yet</h3>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Start by adding products and recording your first sale. AI insights will appear automatically.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {activeInsights.summary}
-                    </p>
-
-                    {activeInsights.business_health && (
-                      <div className="rounded-xl bg-brand/5 border border-brand/20 p-3">
-                        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand mb-1">
-                          <TrendingUp className="h-3.5 w-3.5" /> Business Health
-                        </div>
-                        <p className="text-sm">{activeInsights.business_health}</p>
-                      </div>
-                    )}
-
-                    <InsightList
-                      title="Top sellers"
-                      items={activeInsights.fast_movers}
-                      tone="success"
-                      icon={TrendingUp}
-                    />
-                    <InsightList
-                      title="Slow movers"
-                      items={activeInsights.slow_movers}
-                      tone="warning"
-                      icon={TrendingDown}
-                    />
-                    <InsightList
-                      title="Restock now"
-                      items={activeInsights.restock_now}
-                      tone="destructive"
-                      icon={PackageSearch}
-                    />
-
-                    {activeInsights.profit_tips && activeInsights.profit_tips.length > 0 && (
-                      <div className="rounded-xl bg-accent/40 border border-border p-3">
-                        <div className="text-xs font-semibold uppercase tracking-wider text-accent-foreground mb-1.5">
-                          Profit tips
-                        </div>
-                        <ul className="space-y-1.5 text-sm">
-                          {activeInsights.profit_tips.map((t, i) => (
-                            <li key={i} className="flex gap-2">
-                              <span className="text-brand">→</span>
-                              {t}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                <Link
-                  to="/copilot"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
-                >
-                  Open AI Copilot <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
+        <div className="space-y-5 pb-2">
+          {error && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm">
+              <span>Couldn’t refresh the latest shop data. Showing the last loaded figures.</span>
+              <button
+                type="button"
+                onClick={() => void loadDashboard(true)}
+                className="font-semibold text-brand underline underline-offset-2"
+              >
+                Retry
+              </button>
             </div>
+          )}
 
-            {/* Low Stock */}
-            <div className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
-              <div className="p-5 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-warning-foreground" />
-                  <div>
-                    <div className="text-sm font-semibold">Low stock</div>
-                    <div className="text-xs text-muted-foreground">Reorder soon</div>
-                  </div>
-                </div>
+          <section aria-label="Quick actions" className="grid grid-cols-2 gap-3">
+            <Link
+              to="/sales"
+              className="flex min-h-24 items-center justify-between gap-2 rounded-2xl bg-primary p-4 text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 sm:min-h-28 sm:p-5"
+            >
+              <span>
+                <span className="block text-lg font-semibold sm:text-xl">New sale</span>
+                <span className="mt-1 block text-xs text-primary-foreground/80 sm:text-sm">Record a customer sale</span>
+              </span>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-foreground/15">
+                <Plus className="h-6 w-6" aria-hidden="true" />
+              </span>
+            </Link>
+            <Link
+              to="/inventory"
+              className="flex min-h-24 items-center justify-between gap-2 rounded-2xl border border-border bg-card p-4 shadow-soft transition-colors hover:border-brand/50 sm:min-h-28 sm:p-5"
+            >
+              <span>
+                <span className="block text-lg font-semibold sm:text-xl">Add stock</span>
+                <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">Update your inventory</span>
+              </span>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
+                <Package className="h-5 w-5" aria-hidden="true" />
+              </span>
+            </Link>
+          </section>
+
+          <section aria-label="Today's summary" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground sm:text-sm">
+                <Receipt className="h-4 w-4 text-brand" aria-hidden="true" /> Today’s sales
               </div>
-              <ul className="divide-y divide-border max-h-[420px] overflow-y-auto">
-                {stats.lowStock.length === 0 ? (
-                  <li className="p-5 text-sm text-muted-foreground">All stocked up ✨</li>
-                ) : (
-                  stats.lowStock.map((p) => (
-                    <li
-                      key={p._id}
-                      className="p-4 flex items-center justify-between hover:bg-accent/30 transition-colors"
-                    >
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium truncate">{p.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Threshold {p.low_stock_threshold}
-                        </div>
-                      </div>
-                      <span className="shrink-0 text-xs font-semibold px-2 py-1 rounded-md bg-destructive/10 text-destructive">
-                        {p.qty} left
+              <p className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{fmtINR(stats.todayTotal)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{stats.todayCount} transaction{stats.todayCount === 1 ? "" : "s"}</p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground sm:text-sm">
+                <AlertTriangle className="h-4 w-4 text-warning-foreground" aria-hidden="true" /> Items running low
+              </div>
+              <p className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{stats.lowStock.length}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {stats.lowStock.length === 0 ? "Everything is above its threshold" : "Need a stock check"}
+              </p>
+            </div>
+            <div className="col-span-2 rounded-2xl border border-border bg-card p-4 shadow-soft sm:col-span-1 sm:p-5">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground sm:text-sm">
+                <ShoppingBag className="h-4 w-4 text-brand" aria-hidden="true" /> Products tracked
+              </div>
+              <p className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{products.length}</p>
+              <p className="mt-1 text-xs text-muted-foreground">In your inventory</p>
+            </div>
+          </section>
+
+          <section className="grid gap-4 lg:grid-cols-2">
+            <DashboardCard title="Sales trend · last 7 days" icon={BarChart3}>
+              {hasTrendSales ? (
+                <div className="grid h-48 grid-cols-7 items-end gap-2 px-4 py-5 sm:gap-3 sm:px-5">
+                  {stats.trend.map((day) => (
+                    <div key={day.key} className="flex h-full flex-col items-center justify-end gap-2">
+                      <span className="w-full truncate text-center text-[10px] text-muted-foreground sm:text-xs">
+                        {day.total > 0 ? fmtINR(day.total) : "—"}
                       </span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
-          </div>
-
-         
-
-          {/* ── Recent Sales ── */}
-          <div className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-border">
-              <div>
-                <div className="text-sm font-semibold">Recent sales</div>
-                <div className="text-xs text-muted-foreground">Last 8 transactions</div>
-              </div>
-              <Link to="/sales" className="text-xs font-medium text-brand hover:underline">
-                View all
-              </Link>
-            </div>
-            <div className="p-2">
-              {stats.recentSales.length === 0 ? (
-                <div className="py-10 text-center">
-                  <Receipt className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-sm text-muted-foreground">No sales yet</p>
-                  <Link
-                    to="/sales"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline mt-2"
-                  >
-                    Record your first sale <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  {stats.recentSales.map((s) => (
-                    <SaleCard key={s._id} sale={s} />
+                      <div
+                        className="w-full max-w-10 rounded-t-md bg-brand/80"
+                        style={{ height: `${Math.max((day.total / maxTrendTotal) * 100, day.total > 0 ? 8 : 2)}%` }}
+                        role="img"
+                        aria-label={`${day.label}: ${fmtINR(day.total)} in sales`}
+                      />
+                      <span className="text-[10px] text-muted-foreground sm:text-xs">{day.label}</span>
+                    </div>
                   ))}
                 </div>
+              ) : (
+                <div className="flex min-h-48 flex-col items-center justify-center px-5 text-center">
+                  <TrendingUp className="h-7 w-7 text-muted-foreground/60" aria-hidden="true" />
+                  <p className="mt-2 text-sm font-medium">Your sales trend will appear here</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Record sales to see the last seven days.</p>
+                </div>
               )}
-            </div>
-          </div>
+            </DashboardCard>
 
+            <DashboardCard title="Top-selling products" icon={TrendingUp}>
+              {stats.topProducts.length > 0 ? (
+                <ol className="divide-y divide-border">
+                  {stats.topProducts.map((product, index) => (
+                    <li key={product.name} className="flex items-center gap-3 px-4 py-3 sm:px-5">
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/10 text-sm font-semibold text-brand">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">{product.qty} sold</p>
+                      </div>
+                      <span className="shrink-0 text-sm font-semibold">{fmtINR(product.revenue)}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div className="flex min-h-48 flex-col items-center justify-center px-5 text-center">
+                  <ShoppingBag className="h-7 w-7 text-muted-foreground/60" aria-hidden="true" />
+                  <p className="mt-2 text-sm font-medium">No product sales to rank yet</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Your best sellers will show up after a sale.</p>
+                </div>
+              )}
+            </DashboardCard>
+          </section>
+
+          <section className="grid gap-4 lg:grid-cols-2">
+            <DashboardCard title="Stock to check" icon={AlertTriangle}>
+              {stats.lowStock.length > 0 ? (
+                <ul className="divide-y divide-border">
+                  {stats.lowStock.slice(0, 5).map((product) => (
+                    <li key={product._id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{product.name} is low</p>
+                        <p className="text-xs text-muted-foreground">
+                          {product.qty} {product.unit} left · threshold {product.low_stock_threshold}
+                        </p>
+                      </div>
+                      <Link
+                        to="/inventory"
+                        className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-lg px-3 text-sm font-semibold text-brand hover:bg-brand/5"
+                      >
+                        Add to reorder <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-5 py-8 text-center">
+                  <p className="text-sm font-medium">{products.length ? "No items are running low" : "No inventory yet"}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {products.length ? "We’ll flag products when they reach their stock threshold." : "Add products to start tracking stock."}
+                  </p>
+                </div>
+              )}
+            </DashboardCard>
+
+            <DashboardCard title="Recent sales" icon={Receipt}>
+              {stats.recentSales.length > 0 ? (
+                <>
+                  <ul className="divide-y divide-border">
+                    {stats.recentSales.map((sale) => <SaleRow key={sale._id} sale={sale} />)}
+                  </ul>
+                  <div className="border-t border-border px-4 py-3 sm:px-5">
+                    <Link to="/sales" className="inline-flex min-h-10 items-center gap-1 text-sm font-semibold text-brand">
+                      View all sales <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <div className="px-5 py-8 text-center">
+                  <p className="text-sm font-medium">No sales recorded yet</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Your completed sales will appear here.</p>
+                  <Link to="/sales" className="mt-3 inline-flex min-h-10 items-center gap-1 text-sm font-semibold text-brand">
+                    Record your first sale <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </div>
+              )}
+            </DashboardCard>
+          </section>
         </div>
       )}
     </AppShell>
